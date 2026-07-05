@@ -118,9 +118,9 @@
     <div class="flex-1 flex flex-col h-full bg-gray-50 print-full-width min-w-0">
         <div class="bg-white border-b px-6 py-3 flex justify-between items-center no-print shrink-0 overflow-x-auto">
             <div class="flex space-x-1 border rounded-lg bg-gray-100 p-1 shrink-0">
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">แดชบอร์ด</button>
-                <button onclick="switchTab('diagrams')" id="tab-diagrams" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">ไดอะแกรมแรง (FBD/SFD/BMD)</button>
-                <button onclick="switchTab('report')" id="tab-report" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">รายการคำนวณ</button>
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">Dashboard</button>
+                <button onclick="switchTab('diagrams')" id="tab-diagrams" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Force Diagrams (FBD/SFD/BMD)</button>
+                <button onclick="switchTab('report')" id="tab-report" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Calculation Report</button>
                 <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">สัญลักษณ์ & การออกแบบจุดต่อ</button>
             </div>
             <button onclick="printReport()" class="flex items-center px-4 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 shadow-sm transition-colors shrink-0 ml-4">
@@ -622,27 +622,31 @@
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
             
-            const margin = 40; const scaleX = (cw - 2*margin) / data.L;
-            const stairW_px = data.W * scaleX;
+            const marginX = 40; const marginY = 30; 
+            const scaleX = (cw - 2 * marginX) / data.L;
+            const scaleY = (ch - 2 * marginY) / data.W;
+            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
+            
+            const stairW_px = data.W * scale;
             const cx = cw/2; const cy = ch/2;
-            const startX = cx - (data.L * scaleX)/2;
+            const startX = cx - (data.L * scale)/2;
             
-            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scale, stairW_px);
             
-            const landingX = startX + data.L_flight * scaleX; const landingW_px = data.L_landing * scaleX;
+            const landingX = startX + data.L_flight * scale; const landingW_px = data.L_landing * scale;
             ctx.fillStyle = '#f1f5f9'; ctx.fillRect(landingX, cy - stairW_px/2, landingW_px, stairW_px); ctx.strokeRect(landingX, cy - stairW_px/2, landingW_px, stairW_px);
             
             ctx.lineWidth = 1; ctx.strokeStyle = '#94a3b8';
             const numSteps = Math.round(data.L_flight * 1000 / data.tread);
-            const stepW = (data.L_flight * scaleX) / numSteps;
+            const stepW = (data.L_flight * scale) / numSteps;
             for(let i=1; i<numSteps; i++) {
                 ctx.beginPath(); ctx.moveTo(startX + i*stepW, cy - stairW_px/2); ctx.lineTo(startX + i*stepW, cy + stairW_px/2); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(landingX + landingW_px + i*stepW, cy - stairW_px/2); ctx.lineTo(landingX + landingW_px + i*stepW, cy + stairW_px/2); ctx.stroke();
             }
 
             ctx.setLineDash([5, 5]); ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(startX, cy - stairW_px/2 + 5); ctx.lineTo(startX + data.L * scaleX, cy - stairW_px/2 + 5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(startX, cy + stairW_px/2 - 5); ctx.lineTo(startX + data.L * scaleX, cy + stairW_px/2 - 5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(startX, cy - stairW_px/2 + 5); ctx.lineTo(startX + data.L * scale, cy - stairW_px/2 + 5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(startX, cy + stairW_px/2 - 5); ctx.lineTo(startX + data.L * scale, cy + stairW_px/2 - 5); ctx.stroke();
             ctx.setLineDash([]);
         }
 
@@ -653,13 +657,18 @@
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
 
-            const scaleX = (cw - 80) / data.L; const stairW_px = data.W * scaleX;
-            const cx = cw/2; const cy = ch/2 - 15; const startX = cx - (data.L * scaleX)/2;
+            const marginX = 40; const marginY = 40;
+            const scaleX = (cw - 2 * marginX) / data.L;
+            const scaleY = (ch - 2 * marginY) / data.W;
+            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
 
-            ctx.fillStyle = '#f8fafc'; ctx.fillRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
-            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            const stairW_px = data.W * scale;
+            const cx = cw/2; const cy = ch/2 - 15; const startX = cx - (data.L * scale)/2;
 
-            const x1 = startX + data.L_flight * scaleX; const x2 = startX + (data.L_flight + data.L_landing) * scaleX;
+            ctx.fillStyle = '#f8fafc'; ctx.fillRect(startX, cy - stairW_px/2, data.L * scale, stairW_px);
+            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scale, stairW_px);
+
+            const x1 = startX + data.L_flight * scale; const x2 = startX + (data.L_flight + data.L_landing) * scale;
             ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(x1, cy - stairW_px/2); ctx.lineTo(x1, cy + stairW_px/2); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(x2, cy - stairW_px/2); ctx.lineTo(x2, cy + stairW_px/2); ctx.stroke();
@@ -668,14 +677,14 @@
             ctx.fillText('Stiffener Plate', x1, cy - stairW_px/2 - 10); ctx.fillText('Stiffener Plate', x2, cy - stairW_px/2 - 10);
 
             ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.fillStyle = '#475569';
-            const dimY = cy + stairW_px/2 + 35;
+            const dimY = cy + stairW_px/2 + 25;
             const drawDim = (fX, tX, txt) => {
                 ctx.beginPath(); ctx.moveTo(fX, cy + stairW_px/2 + 5); ctx.lineTo(fX, dimY + 5); ctx.moveTo(tX, cy + stairW_px/2 + 5); ctx.lineTo(tX, dimY + 5); ctx.moveTo(fX, dimY); ctx.lineTo(tX, dimY); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(fX, dimY); ctx.lineTo(fX+6, dimY-4); ctx.lineTo(fX+6, dimY+4); ctx.fill();
                 ctx.beginPath(); ctx.moveTo(tX, dimY); ctx.lineTo(tX-6, dimY-4); ctx.lineTo(tX-6, dimY+4); ctx.fill();
                 ctx.fillText(txt, (fX+tX)/2, dimY - 8);
             };
-            drawDim(startX, x1, `L1 = ${data.L_flight.toFixed(2)} m`); drawDim(x1, x2, `ชานพัก = ${data.L_landing.toFixed(2)} m`); drawDim(x2, startX + data.L * scaleX, `L2 = ${data.L_flight.toFixed(2)} m`);
+            drawDim(startX, x1, `L1 = ${data.L_flight.toFixed(2)} m`); drawDim(x1, x2, `ชานพัก = ${data.L_landing.toFixed(2)} m`); drawDim(x2, startX + data.L * scale, `L2 = ${data.L_flight.toFixed(2)} m`);
         }
 
         function drawFBD(data) {
