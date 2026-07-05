@@ -278,39 +278,6 @@
         };
         const trans = (a) => a[0].map((_, c) => a.map(r => r[c]));
 
-        // ฟังก์ชันคำนวณ Scale กลาง เพื่อให้รูปภาพทุกรูปใช้มาตราส่วนเดียวกัน
-        function calculateMasterScale(data) {
-            const elCanvas = document.getElementById('canvasElevation');
-            const plCanvas = document.getElementById('canvasPlan');
-            const stCanvas = document.getElementById('canvasStiffenerPlan');
-
-            if(!elCanvas.parentElement || !plCanvas.parentElement) return 1;
-
-            const cwEl = elCanvas.parentElement.clientWidth;
-            const chEl = elCanvas.parentElement.clientHeight;
-            const cwPl = plCanvas.parentElement.clientWidth;
-            const chPl = plCanvas.parentElement.clientHeight;
-            
-            if(cwEl === 0 || chEl === 0 || cwPl === 0 || chPl === 0) return 1;
-
-            // กำหนด Margin สำหรับแต่ละรูป
-            const marginElX = 60; const marginElY = 60;
-            const marginPlX = 60; const marginPlY = 40;
-
-            // หา Scale สำหรับรูปด้าน (Elevation)
-            const scaleElX = (cwEl - 2 * marginElX) / data.L;
-            const scaleElY = (chEl - 2 * marginElY) / data.H;
-            const scaleEl = Math.min(scaleElX, scaleElY);
-
-            // หา Scale สำหรับรูปแปลน (Plan)
-            const scalePlX = (cwPl - 2 * marginPlX) / data.L;
-            const scalePlY = (chPl - 2 * marginPlY) / data.W;
-            const scalePl = Math.min(scalePlX, scalePlY);
-
-            // ใช้ Scale ที่เล็กที่สุด เพื่อให้รับประกันว่าภาพจะวาดพอดีในทุกกล่อง
-            return Math.min(scaleEl, scalePl);
-        }
-
         function calculateAndDraw() {
             try {
                 const L = parseFloat(document.getElementById('span_L').value) || 0;
@@ -597,11 +564,7 @@
                     forceData, maxA, minA, maxS, minS, maxB, minB
                 };
 
-                const masterScale = calculateMasterScale(calcData);
-
-                drawElevation(calcData, masterScale); 
-                drawPlan(calcData, masterScale); 
-                drawStiffenerPlan(calcData, masterScale);
+                drawElevation(calcData); drawPlan(calcData); drawStiffenerPlan(calcData);
                 drawFBD(calcData); drawTrueDiagrams(calcData); 
                 generateReport(calcData); generateNom(calcData);
 
@@ -610,7 +573,7 @@
             }
         }
 
-        function drawElevation(data, scale) {
+        function drawElevation(data) {
             const canvas = document.getElementById('canvasElevation');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth;
@@ -619,6 +582,9 @@
             canvas.width = cw; canvas.height = ch;
             ctx.clearRect(0, 0, cw, ch);
             
+            const margin = 50; const drawW = cw - 2*margin; const drawH = ch - 2*margin;
+            const scaleX = drawW / data.L; const scaleY = drawH / data.H;
+            const scale = Math.min(scaleX, scaleY) * 0.8;
             const cx = cw/2; const cy = ch/2;
             const mapPt = (x, y) => ({ x: cx + (x - data.L/2) * scale, y: cy - (y - data.H/2) * scale });
 
@@ -649,12 +615,17 @@
             ctx.save(); ctx.translate(dimX - 5, cy); ctx.rotate(-Math.PI/2); ctx.fillText(`H = ${data.H} m`, 0, 0); ctx.restore();
         }
 
-        function drawPlan(data, scale) {
+        function drawPlan(data) {
             const canvas = document.getElementById('canvasPlan');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
+            
+            const marginX = 40; const marginY = 30; 
+            const scaleX = (cw - 2 * marginX) / data.L;
+            const scaleY = (ch - 2 * marginY) / data.W;
+            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
             
             const stairW_px = data.W * scale;
             const cx = cw/2; const cy = ch/2;
@@ -679,12 +650,17 @@
             ctx.setLineDash([]);
         }
 
-        function drawStiffenerPlan(data, scale) {
+        function drawStiffenerPlan(data) {
             const canvas = document.getElementById('canvasStiffenerPlan');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
+
+            const marginX = 40; const marginY = 40;
+            const scaleX = (cw - 2 * marginX) / data.L;
+            const scaleY = (ch - 2 * marginY) / data.W;
+            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
 
             const stairW_px = data.W * scale;
             const cx = cw/2; const cy = ch/2 - 15; const startX = cx - (data.L * scale)/2;
