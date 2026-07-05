@@ -132,7 +132,7 @@
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">แดชบอร์ด</button>
                 <button onclick="switchTab('diagrams')" id="tab-diagrams" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">ไดอะแกรมแรง (FBD/SFD/BMD)</button>
                 <button onclick="switchTab('report')" id="tab-report" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">รายการคำนวณ</button>
-                <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">ตัวแปร/สัญลักษณ์</button>
+                <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">สัญลักษณ์ & การออกแบบจุดต่อ</button>
             </div>
             <button onclick="printReport()" class="flex items-center px-4 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 shadow-sm transition-colors shrink-0 ml-4">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
@@ -255,30 +255,107 @@
                         <thead><tr><th>สัญลักษณ์ (Symbol)</th><th>ความหมาย (Description)</th><th>หน่วย (Unit)</th></tr></thead>
                         <tbody>
                             <tr><td>$L, H, W$</td><td>ระยะพาดแนวนอน, ความสูงรวม, และความกว้างบันได</td><td>m</td></tr>
-                            <tr><td>$L_{landing}$</td><td>ความยาวชานพักตรงกลาง</td><td>m</td></tr>
                             <tr><td>$\theta$</td><td>มุมเอียงของบันไดเทียบกับแนวระนาบ</td><td>degrees</td></tr>
                             <tr><td>$d, b, t$</td><td>ความลึก, ความกว้าง, และความหนาของหน้าตัดเหล็กแม่บันได</td><td>mm</td></tr>
-                            <tr><td>$d_{in}, b_{in}$</td><td>ความลึกด้านใน, ความกว้างด้านในของหน้าตัดเหล็ก</td><td>mm</td></tr>
-                            <tr><td>$F_y, E$</td><td>กำลังรับแรงดึงคราก (Yield Strength) และ โมดูลัสยืดหยุ่น (Elastic Modulus)</td><td>kg/cm²</td></tr>
                             <tr><td>$A, I_x, Z_x$</td><td>พื้นที่หน้าตัด, โมเมนต์ความเฉื่อย, มอดูลัสหน้าตัดพลาสติก</td><td>cm², cm⁴, cm³</td></tr>
-                            <tr><td>$A_w$</td><td>พื้นที่รับแรงเฉือนของหน้าตัด (Web Shear Area)</td><td>cm²</td></tr>
-                            <tr><td>$LL, SDL$</td><td>น้ำหนักบรรทุกจร และ น้ำหนักวัสดุตกแต่ง</td><td>kg/m²</td></tr>
-                            <tr><td>$W_{trib}$</td><td>ระยะกว้างรับน้ำหนักของแม่บันได 1 ข้าง (Tributary Width)</td><td>m</td></tr>
-                            <tr><td>$w_{DL}, w_{LL}$</td><td>น้ำหนักบรรทุกคงที่ และ น้ำหนักบรรทุกจรแบบแผ่กระจายบนแม่บันได</td><td>kg/m</td></tr>
-                            <tr><td>$w_u$</td><td>น้ำหนักบรรทุกประลัยกระจายสม่ำเสมอ (Factored Load)</td><td>kg/m</td></tr>
-                            <tr><td>$R_y, H_x, M_z$</td><td>แรงปฏิกิริยาแนวดิ่ง, แรงถีบแนวราบ, และโมเมนต์ดัดที่จุดรองรับ</td><td>kg, kg-m</td></tr>
-                            <tr><td>$P_u, M_u, V_u$</td><td>แรงอัดประลัย, โมเมนต์ดัดประลัย, แรงเฉือนประลัยสูงสุดที่เกิดขึ้น</td><td>kg, kg-m</td></tr>
-                            <tr><td>$\phi_c, \phi_b, \phi_v$</td><td>ตัวคูณลดกำลัง (Resistance Factor) สำหรับแรงอัด, แรงดัด, และแรงเฉือน</td><td>-</td></tr>
-                            <tr><td>$P_n, M_n, V_n$</td><td>กำลังรับแรงอัดระบุ, โมเมนต์ดัดระบุ, แรงเฉือนระบุของหน้าตัด</td><td>kg, kg-m</td></tr>
-                            <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดบริเวณจุดหักมุม (Kink Point Moment)</td><td>kg-m</td></tr>
-                            <tr><td>$P_f$</td><td>แรงตามแนวแกนในปีกคานบริเวณจุดหักมุม (Flange Force)</td><td>kg</td></tr>
+                            <tr><td>$E, F_y$</td><td>โมดูลัสยืดหยุ่น และ กำลังครากของเหล็ก (Yield Strength)</td><td>kg/cm²</td></tr>
+                            <tr><td>$LL, SDL$</td><td>น้ำหนักบรรทุกจร และ น้ำหนักวัสดุตกแต่ง (ต่อพื้นที่)</td><td>kg/m²</td></tr>
+                            <tr><td>$w_{DL}, w_{LL}, w_u$</td><td>น้ำหนักคงที่, น้ำหนักจร, และน้ำหนักบรรทุกประลัย (ต่อความยาว)</td><td>kg/m</td></tr>
+                            <tr><td>$R_y, H_x, M_z$</td><td>แรงปฏิกิริยาแนวดิ่ง, แรงถีบแนวราบ, และโมเมนต์ที่จุดรองรับ</td><td>kg, kg-m</td></tr>
+                            <tr><td>$P_u, M_u, V_u$</td><td>แรงอัดประลัย, โมเมนต์ดัดประลัย, แรงเฉือนประลัยสูงสุด (Local)</td><td>kg, kg-m</td></tr>
+                            <tr><td>$P_n, M_n, V_n$</td><td>กำลังรับแรงอัดระบุ, โมเมนต์ดัดระบุ, แรงเฉือนระบุ</td><td>kg, kg-m</td></tr>
+                            <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดที่เกิดขึ้นบริเวณจุดหักมุม (Kink Point)</td><td>kg-m</td></tr>
+                            <tr><td>$P_f$</td><td>แรงกระทำในปีกคาน (Flange Force) บริเวณจุดหักมุม</td><td>kg</td></tr>
                             <tr><td>$F_r$</td><td>แรงลัพธ์ในแนวฉากที่กระทำต่อปีกคานบริเวณจุดหักมุม (Radial Force)</td><td>kg</td></tr>
-                            <tr><td>$A_{req}, t_{req}$</td><td>พื้นที่หน้าตัด และความหนาที่ต้องการของแผ่นดาม (Stiffener Plate)</td><td>cm², mm</td></tr>
-                            <tr><td>$\Delta_{limit}, \Delta_{LL}$</td><td>เกณฑ์การโก่งตัวที่ยอมรับได้ และ การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร</td><td>mm</td></tr>
-                            <tr><td>$\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักกึ่งถาวร (DL + 10% LL) สำหรับประเมินการสั่นสะเทือน</td><td>mm</td></tr>
-                            <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได (Natural Frequency)</td><td>Hz</td></tr>
+                            <tr><td>$A_{req}, t_{req}$</td><td>พื้นที่หน้าตัดและความหนาที่ต้องการสำหรับแผ่นดาม (Stiffener Plate)</td><td>cm², mm</td></tr>
+                            <tr><td>$\phi$</td><td>ตัวคูณลดกำลัง (Resistance Factor) = 0.90</td><td>-</td></tr>
+                            <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได</td><td>Hz</td></tr>
+                            <tr><td>$\Delta_{LL}$</td><td>การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร</td><td>mm</td></tr>
+                            <tr><td>$\Delta_{limit}$</td><td>เกณฑ์ยอมรับการโก่งตัวสูงสุด</td><td>mm</td></tr>
+                            <tr><td>$\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักจำลองมวลแอกทีฟ</td><td>mm</td></tr>
                         </tbody>
                     </table>
+
+                    <div class="mt-12">
+                        <div class="report-header">
+                            <h2 class="text-2xl font-bold text-gray-900">คำแนะนำการนำแรงไปออกแบบจุดเชื่อมต่อ (Connection Design)</h2>
+                            <p class="text-gray-500 mt-1">ในทางวิบัติวิทยา โครงสร้างบันไดมักจะวิบัติที่จุดเชื่อมต่อก่อนตัวแม่บันไดเสมอ การนำค่าจากโปรแกรมไปออกแบบจุดต่อมีแนวทางดังนี้</p>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">1. จุดรองรับที่ฐานบันได (Base Support / Base Plate)</h3>
+                                <p class="text-sm text-gray-700 mb-2">คือจุดที่โคนบันไดเหล็กยึดติดกับพื้นตอม่อคอนกรีต หรือคานเหล็กชั้นล่าง</p>
+                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                    <li><strong>$R_y$ (แรงปฏิกิริยาแนวดิ่ง):</strong> ใช้คำนวณหากำลังรับแรงเฉือนของรอยเชื่อม, แรงเฉือนใน Anchor Bolt และ Bearing (การกดทับ) บน Base Plate</li>
+                                    <li><strong>$H_x$ (แรงถีบแนวราบ):</strong> <em>ถ้าจุดรองรับเป็น Fixed หรือ Pinned</em> จะต้องนำแรงนี้ไปคำนวณแรงเฉือน (Shear) หรือแรงดึง (Tension) ในน็อตฝังด้วย (แรงนี้มักจะทำให้จุดต่อวิกฤต)</li>
+                                    <li><strong>$M_z$ (โมเมนต์ที่ฐาน):</strong> <em>ถ้าจุดรองรับเป็น Fixed</em> ต้องนำค่าไปหาความหนาแผ่นเหล็ก Base Plate และคำนวณแรงดึง-อัดในกลุ่มน็อตฝัง (Anchor Bolt)</li>
+                                </ul>
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
+                                    <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดและความหนาของ Base Plate, ขนาด/ระยะฝังของ Anchor Bolt, ขนาดรอยเชื่อม (Fillet Weld)
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">2. จุดรองรับด้านบน (Top Connection)</h3>
+                                <p class="text-sm text-gray-700 mb-2">คือจุดที่ชานพักบันไดยึดเข้ากับคานหลักของตัวอาคาร (คานเหล็กหรือคานคอนกรีต)</p>
+                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                    <li>ใช้หลักการเดียวกับฐานบันไดคือดึงค่าปฏิกิริยา <strong>$R_y, H_x, M_z$</strong> ไปใช้งาน</li>
+                                </ul>
+                                <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-sm text-red-800">
+                                    <span class="font-bold">⚠️ ข้อควรระวังสูงสุด:</span> คานของตัวอาคารที่มารับบันได จะต้องถูกออกแบบให้รับแรง <strong>$H_x$ (แรงถีบ)</strong> จากบันไดด้วย ซึ่งจะทำให้คานอาคารเกิด "การดัดในแกนอ่อน (Weak-axis Bending)" หรือ "แรงบิด (Torsion)" หากไม่ได้เตรียมคานอาคารไว้รับแรงถีบ แนะนำให้ออกแบบจุดรองรับบันไดฝั่งใดฝั่งหนึ่งเป็นจุดเลื่อน (Roller) เพื่อให้ $H_x = 0$
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">3. รอยต่อจุดหักมุม (Kink Point / Splice Connection)</h3>
+                                <p class="text-sm text-gray-700 mb-2">จุดที่ช่างจะต้องทำการ "ตัดบาก (Miter Cut)" และเชื่อมต่อเหล็กกล่องให้หักมุมตามรูปทรงบันได</p>
+                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                    <li><strong>$M_{kink}$ (โมเมนต์ที่จุดหักมุม):</strong> ใช้คำนวณหาแรงดึง/แรงอัดในปีกคาน ($P_f$) เพื่อประเมินพื้นที่หน้าตัดของรอยเชื่อม</li>
+                                    <li><strong>$F_r$ (Radial Force):</strong> ใช้สำหรับออกแบบความหนาของแผ่น Stiffener Plate ดามด้านใน เพื่อป้องกันไม่ให้มุมคานเหล็กกล่องฉีกขาดเสียรูป</li>
+                                    <li><strong>$V_u$ และ $P_u$ (Local Forces):</strong> นำค่าแรงเฉือนและแรงตามแนวแกนบริเวณรอยต่อ (ดูได้จากแท็บไดอะแกรม) มารวมกับการเช็ครอยเชื่อม</li>
+                                </ul>
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
+                                    <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดรอยเชื่อมต่อชน (แนะนำให้เป็น CJP - Complete Joint Penetration) และการเชื่อมยึดแผ่น Stiffener
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="text-lg font-bold text-gray-800 mb-3">สรุปการดึงค่าไปใช้ (Cheat Sheet)</h3>
+                            <table class="calc-table">
+                                <thead>
+                                    <tr>
+                                        <th>ชิ้นส่วนที่ต้องการออกแบบต่อ</th>
+                                        <th>ค่าที่ต้องดึงจากโปรแกรมไปใช้ (ดูในรายการคำนวณ)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>น็อตฝัง (Anchor Bolts) / รอยเชื่อมโคนบันได</strong></td>
+                                        <td>แรงปฏิกิริยารวม: <strong>$R_y, H_x, M_z$</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>ความหนาแผ่นเพลท (Base Plate)</strong></td>
+                                        <td>แรงกดและโมเมนต์: <strong>$R_y, M_z$</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>คานอาคารที่มารับบันได (Supporting Beam)</strong></td>
+                                        <td>Point Load จากบันได: <strong>$R_y, H_x$</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>รอยต่อเชื่อมบากมุม (Kink Splice Weld)</strong></td>
+                                        <td>แรงภายในชิ้นส่วน: <strong>$M_{kink}, V_{local}, P_{local}$</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>แผ่นดามปีกคาน (Stiffener Plate)</strong></td>
+                                        <td>แรงลัพธ์แนวฉาก: <strong>$F_r$</strong> <em>(โปรแกรมคำนวณความหนาและพิกัดให้แล้ว)</em></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
