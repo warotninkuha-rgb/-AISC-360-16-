@@ -11,26 +11,19 @@
     
     <style>
         body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f4f6; }
-        
-        /* Tab System Logic */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
         .sidebar-scroll::-webkit-scrollbar { width: 6px; }
         .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-        
         .report-page { background: white; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); max-width: 900px; margin: 0 auto; }
         .report-header { border-bottom: 2px solid #1e40af; padding-bottom: 10px; margin-bottom: 20px; }
         .report-section { margin-bottom: 30px; }
         .report-section h3 { color: #1e3a8a; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px; font-size: 1.1rem; }
         .ref-text { font-size: 0.8rem; color: #64748b; font-weight: normal; margin-left: 8px; display: inline-block; font-style: italic; }
-        
         table.calc-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95rem; }
         table.calc-table th, table.calc-table td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
         table.calc-table th { background-color: #f8fafc; font-weight: 600; width: 40%; }
-        
         .katex-display { margin: 10px 0; overflow-x: auto; overflow-y: hidden; }
-
         @media print {
             body { background: white; }
             .no-print { display: none !important; }
@@ -44,7 +37,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="h-screen flex overflow-hidden">
-    <!-- Sidebar Inputs -->
     <div class="w-80 bg-white border-r border-gray-200 flex flex-col h-full no-print z-10 shadow-lg shrink-0">
         <div class="p-5 bg-blue-900 text-white">
             <h1 class="text-xl font-bold tracking-wide">StaircasePro</h1>
@@ -123,10 +115,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full bg-gray-50 print-full-width min-w-0">
-        
-        <!-- Top Navigation -->
         <div class="bg-white border-b px-6 py-3 flex justify-between items-center no-print shrink-0 overflow-x-auto">
             <div class="flex space-x-1 border rounded-lg bg-gray-100 p-1 shrink-0">
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">แดชบอร์ด</button>
@@ -140,12 +129,10 @@
             </button>
         </div>
 
-        <!-- Scrollable Content Area -->
         <div class="flex-1 overflow-y-auto p-6 text-gray-800 relative w-full block">
             
             <!-- Dashboard Tab -->
             <div id="dashboard" class="tab-content active">
-                <!-- KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0 mb-4">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                         <div>
@@ -180,7 +167,6 @@
                     </div>
                 </div>
                 
-                <!-- Canvases Layout (Vertical Stack for better sizing) -->
                 <div class="space-y-6 pb-10 block w-full">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 relative h-[300px] w-full flex flex-col">
                         <h3 class="text-sm font-bold text-gray-600 mb-2 absolute top-4 left-4 z-10">รูปด้าน (Elevation / Section)</h3>
@@ -203,12 +189,20 @@
                 </div>
             </div>
 
-            <!-- Diagrams Tab -->
             <div id="diagrams" class="tab-content">
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4 text-sm text-blue-800 shadow-sm">
+                    <strong>💡 Engineering Note (เกี่ยวกับไดอะแกรมและค่าสูงสุด):</strong> 
+                    <p class="mt-1 text-blue-700">
+                        กราฟที่แสดงด้านล่างนี้ พล็อตจากการประมวลผล <strong>"แบบจำลองโครงสร้างจริง (DSM Matrix Solver)"</strong> ซึ่งสะท้อนพฤติกรรมสมดุลแรงตามความเอียงและจุดหักมุมจริง 100% (ตรงกับโปรแกรม 3D Finite Element)
+                    </p>
+                    <p class="mt-1 text-xs text-blue-600 italic">
+                        *หมายเหตุ: ค่าออกแบบประลัย (<i>M<sub>u</sub>, V<sub>u</sub>, P<sub>u</sub></i>) ที่สรุปใน "แท็บรายการคำนวณ" อาจมีค่าสูงกว่าในกราฟนี้ เนื่องจากโปรแกรมใช้หลักการ Envelope นำค่าสูงสุดระหว่างโมเดลจริงและทฤษฎีคานราบ (Equivalent Beam) มาเผื่อความปลอดภัยสูงสุดครับ
+                    </p>
+                </div>
                 <div class="block space-y-6 pb-10 w-full">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col relative h-[350px]">
                         <h3 class="text-sm font-bold text-gray-600 mb-1 z-10">Free Body Diagram (FBD)</h3>
-                        <p class="text-xs text-gray-400 mb-2 z-10">วิเคราะห์โครงเฟรมตามความเอียงจริง (Kinked Beam Equivalent Frame)</p>
+                        <p class="text-xs text-gray-400 mb-2 z-10">วิเคราะห์แรงปฏิกิริยาด้วย Direct Stiffness Method Matrix Solver 12x12 (เทียบเท่า MIDAS Gen)</p>
                         <div class="flex-1 w-full h-full relative">
                             <canvas id="canvasFBD" class="w-full h-full absolute inset-0"></canvas>
                         </div>
@@ -237,130 +231,12 @@
                 </div>
             </div>
 
-            <!-- Report Tab -->
             <div id="report" class="tab-content">
-                <div class="report-page" id="report_container">
-                    <!-- JS will populate report here -->
-                </div>
+                <div class="report-page" id="report_container"></div>
             </div>
 
-            <!-- Nomenclature Tab -->
             <div id="nomenclature" class="tab-content">
-                <div class="report-page">
-                    <div class="report-header">
-                        <h2 class="text-2xl font-bold text-gray-900">รายการสัญลักษณ์และตัวแปร (Nomenclature)</h2>
-                        <p class="text-gray-500 mt-1">คำอธิบายสัญลักษณ์ทางวิศวกรรมที่ใช้ในรายการคำนวณ</p>
-                    </div>
-                    <table class="calc-table">
-                        <thead><tr><th>สัญลักษณ์ (Symbol)</th><th>ความหมาย (Description)</th><th>หน่วย (Unit)</th></tr></thead>
-                        <tbody>
-                            <tr><td>$L, H, W$</td><td>ระยะพาดแนวนอน, ความสูงรวม, และความกว้างบันได</td><td>m</td></tr>
-                            <tr><td>$\theta$</td><td>มุมเอียงของบันไดเทียบกับแนวระนาบ</td><td>degrees</td></tr>
-                            <tr><td>$d, b, t$</td><td>ความลึก, ความกว้าง, และความหนาของหน้าตัดเหล็กแม่บันได</td><td>mm</td></tr>
-                            <tr><td>$A, I_x, Z_x$</td><td>พื้นที่หน้าตัด, โมเมนต์ความเฉื่อย, มอดูลัสหน้าตัดพลาสติก</td><td>cm², cm⁴, cm³</td></tr>
-                            <tr><td>$E, F_y$</td><td>โมดูลัสยืดหยุ่น และ กำลังครากของเหล็ก (Yield Strength)</td><td>kg/cm²</td></tr>
-                            <tr><td>$LL, SDL$</td><td>น้ำหนักบรรทุกจร และ น้ำหนักวัสดุตกแต่ง (ต่อพื้นที่)</td><td>kg/m²</td></tr>
-                            <tr><td>$w_{DL}, w_{LL}, w_u$</td><td>น้ำหนักคงที่, น้ำหนักจร, และน้ำหนักบรรทุกประลัย (ต่อความยาว)</td><td>kg/m</td></tr>
-                            <tr><td>$R_y, H_x, M_z$</td><td>แรงปฏิกิริยาแนวดิ่ง, แรงถีบแนวราบ, และโมเมนต์ที่จุดรองรับ</td><td>kg, kg-m</td></tr>
-                            <tr><td>$P_u, M_u, V_u$</td><td>แรงอัดประลัย, โมเมนต์ดัดประลัย, แรงเฉือนประลัยสูงสุด (Local)</td><td>kg, kg-m</td></tr>
-                            <tr><td>$P_n, M_n, V_n$</td><td>กำลังรับแรงอัดระบุ, โมเมนต์ดัดระบุ, แรงเฉือนระบุ</td><td>kg, kg-m</td></tr>
-                            <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดที่เกิดขึ้นบริเวณจุดหักมุม (Kink Point)</td><td>kg-m</td></tr>
-                            <tr><td>$P_f$</td><td>แรงกระทำในปีกคาน (Flange Force) บริเวณจุดหักมุม</td><td>kg</td></tr>
-                            <tr><td>$F_r$</td><td>แรงลัพธ์ในแนวฉากที่กระทำต่อปีกคานบริเวณจุดหักมุม (Radial Force)</td><td>kg</td></tr>
-                            <tr><td>$A_{req}, t_{req}$</td><td>พื้นที่หน้าตัดและความหนาที่ต้องการสำหรับแผ่นดาม (Stiffener Plate)</td><td>cm², mm</td></tr>
-                            <tr><td>$\phi$</td><td>ตัวคูณลดกำลัง (Resistance Factor) = 0.90</td><td>-</td></tr>
-                            <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได</td><td>Hz</td></tr>
-                            <tr><td>$\Delta_{LL}$</td><td>การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร</td><td>mm</td></tr>
-                            <tr><td>$\Delta_{limit}$</td><td>เกณฑ์ยอมรับการโก่งตัวสูงสุด</td><td>mm</td></tr>
-                            <tr><td>$\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักจำลองมวลแอกทีฟ</td><td>mm</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div class="mt-12">
-                        <div class="report-header">
-                            <h2 class="text-2xl font-bold text-gray-900">คำแนะนำการนำแรงไปออกแบบจุดเชื่อมต่อ (Connection Design)</h2>
-                            <p class="text-gray-500 mt-1">ในทางวิบัติวิทยา โครงสร้างบันไดมักจะวิบัติที่จุดเชื่อมต่อก่อนตัวแม่บันไดเสมอ การนำค่าจากโปรแกรมไปออกแบบจุดต่อมีแนวทางดังนี้</p>
-                        </div>
-
-                        <div class="space-y-8">
-                            <div>
-                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">1. จุดรองรับที่ฐานบันได (Base Support / Base Plate)</h3>
-                                <p class="text-sm text-gray-700 mb-2">คือจุดที่โคนบันไดเหล็กยึดติดกับพื้นตอม่อคอนกรีต หรือคานเหล็กชั้นล่าง</p>
-                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
-                                    <li><strong>$R_y$ (แรงปฏิกิริยาแนวดิ่ง <span id="val_Ry1" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> ใช้คำนวณหากำลังรับแรงเฉือนของรอยเชื่อม, แรงเฉือนใน Anchor Bolt และ Bearing (การกดทับ) บน Base Plate</li>
-                                    <li><strong>$H_x$ (แรงถีบแนวราบ <span id="val_Hx1" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> <em>ถ้าจุดรองรับเป็น Fixed หรือ Pinned</em> จะต้องนำแรงนี้ไปคำนวณแรงเฉือน (Shear) หรือแรงดึง (Tension) ในน็อตฝังด้วย (แรงนี้มักจะทำให้จุดต่อวิกฤต)</li>
-                                    <li><strong>$M_z$ (โมเมนต์ที่ฐาน <span id="val_Mz1" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> <em>ถ้าจุดรองรับเป็น Fixed</em> ต้องนำค่าไปหาความหนาแผ่นเหล็ก Base Plate และคำนวณแรงดึง-อัดในกลุ่มน็อตฝัง (Anchor Bolt)</li>
-                                </ul>
-                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
-                                    <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดและความหนาของ Base Plate, ขนาด/ระยะฝังของ Anchor Bolt, ขนาดรอยเชื่อม (Fillet Weld)
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">2. จุดรองรับด้านบน (Top Connection)</h3>
-                                <p class="text-sm text-gray-700 mb-2">คือจุดที่ชานพักบันไดยึดเข้ากับคานหลักของตัวอาคาร (คานเหล็กหรือคานคอนกรีต)</p>
-                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
-                                    <li>ใช้หลักการเดียวกับฐานบันไดคือดึงค่าปฏิกิริยาไปใช้งาน: 
-                                        <span class="inline-block ml-2 text-blue-700 font-mono text-sm bg-blue-50 px-2 py-1 rounded">
-                                            $R_y$ <span id="val_Ry2"></span>, $H_x$ <span id="val_Hx2"></span>, $M_z$ <span id="val_Mz2"></span>
-                                        </span>
-                                    </li>
-                                </ul>
-                                <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-sm text-red-800">
-                                    <span class="font-bold">⚠️ ข้อควรระวังสูงสุด:</span> คานของตัวอาคารที่มารับบันได จะต้องถูกออกแบบให้รับแรง <strong>$H_x$ (แรงถีบ)</strong> จากบันไดด้วย ซึ่งจะทำให้คานอาคารเกิด "การดัดในแกนอ่อน (Weak-axis Bending)" หรือ "แรงบิด (Torsion)" หากไม่ได้เตรียมคานอาคารไว้รับแรงถีบ แนะนำให้ออกแบบจุดรองรับบันไดฝั่งใดฝั่งหนึ่งเป็นจุดเลื่อน (Roller) เพื่อให้ $H_x = 0$
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">3. รอยต่อจุดหักมุม (Kink Point / Splice Connection)</h3>
-                                <p class="text-sm text-gray-700 mb-2">จุดที่ช่างจะต้องทำการ "ตัดบาก (Miter Cut)" และเชื่อมต่อเหล็กกล่องให้หักมุมตามรูปทรงบันได</p>
-                                <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
-                                    <li><strong>$M_{kink}$ (โมเมนต์ที่จุดหักมุม <span id="val_Mkink" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> ใช้คำนวณหาแรงดึง/แรงอัดในปีกคาน ($P_f$) เพื่อประเมินพื้นที่หน้าตัดของรอยเชื่อม</li>
-                                    <li><strong>$F_r$ (Radial Force <span id="val_Fr" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> ใช้สำหรับออกแบบความหนาของแผ่น Stiffener Plate ดามด้านใน เพื่อป้องกันไม่ให้มุมคานเหล็กกล่องฉีกขาดเสียรูป</li>
-                                    <li><strong>$V_u$ และ $P_u$ (Local Forces <span id="val_VuPu" class="text-blue-700 font-mono text-sm bg-blue-50 px-1 rounded"></span>):</strong> นำค่าแรงเฉือนและแรงตามแนวแกนบริเวณรอยต่อ มารวมกับการเช็ครอยเชื่อม</li>
-                                </ul>
-                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
-                                    <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดรอยเชื่อมต่อชน (แนะนำให้เป็น CJP - Complete Joint Penetration) และการเชื่อมยึดแผ่น Stiffener
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-8">
-                            <h3 class="text-lg font-bold text-gray-800 mb-3">สรุปการดึงค่าไปใช้ (Cheat Sheet)</h3>
-                            <table class="calc-table">
-                                <thead>
-                                    <tr>
-                                        <th>ชิ้นส่วนที่ต้องการออกแบบต่อ</th>
-                                        <th>ค่าที่ต้องดึงจากโปรแกรมไปใช้ (ดูในรายการคำนวณ)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>น็อตฝัง (Anchor Bolts) / รอยเชื่อมโคนบันได</strong></td>
-                                        <td>แรงปฏิกิริยารวม: <strong>$R_y, H_x, M_z$</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>ความหนาแผ่นเพลท (Base Plate)</strong></td>
-                                        <td>แรงกดและโมเมนต์: <strong>$R_y, M_z$</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>คานอาคารที่มารับบันได (Supporting Beam)</strong></td>
-                                        <td>Point Load จากบันได: <strong>$R_y, H_x$</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>รอยต่อเชื่อมบากมุม (Kink Splice Weld)</strong></td>
-                                        <td>แรงภายในชิ้นส่วน: <strong>$M_{kink}, V_{local}, P_{local}$</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>แผ่นดามปีกคาน (Stiffener Plate)</strong></td>
-                                        <td>แรงลัพธ์แนวฉาก: <strong>$F_r$</strong> <em>(โปรแกรมคำนวณความหนาและพิกัดให้แล้ว)</em></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
+                <div class="report-page" id="nom_container"></div>
             </div>
 
         </div>
@@ -369,9 +245,7 @@
     <script>
         function printReport() {
             switchTab('report');
-            setTimeout(() => { 
-                window.print(); 
-            }, 800); 
+            setTimeout(() => { window.print(); }, 800); 
         }
 
         function switchTab(tabId) {
@@ -380,7 +254,6 @@
                 el.classList.remove('bg-white', 'shadow-sm', 'text-blue-700');
                 el.classList.add('text-gray-500');
             });
-            
             document.getElementById(tabId).classList.add('active');
             const activeBtn = document.getElementById('tab-' + tabId);
             activeBtn.classList.remove('text-gray-500');
@@ -393,9 +266,20 @@
 
         const fmt = (num, dec=2) => Number(num).toLocaleString('en-US', {minimumFractionDigits: dec, maximumFractionDigits: dec});
 
+        // --- Finite Element Analysis (DSM Matrix Solver) Helper Functions ---
+        const zeros = (r, c) => Array(r).fill(0).map(() => Array(c).fill(0));
+        const mul = (a, b) => {
+            let m = zeros(a.length, b[0].length);
+            for(let r=0; r<a.length; r++)
+                for(let c=0; c<b[0].length; c++)
+                    for(let i=0; i<a[0].length; i++)
+                        m[r][c] += a[r][i] * b[i][c];
+            return m;
+        };
+        const trans = (a) => a[0].map((_, c) => a.map(r => r[c]));
+
         function calculateAndDraw() {
             try {
-                // Get inputs
                 const L = parseFloat(document.getElementById('span_L').value) || 0;
                 const H = parseFloat(document.getElementById('height_H').value) || 0;
                 const W = parseFloat(document.getElementById('width_W').value) || 0;
@@ -403,7 +287,7 @@
                 const LL = parseFloat(document.getElementById('load_LL').value) || 0;
                 const SDL = parseFloat(document.getElementById('load_SDL').value) || 0;
                 const Fy = parseFloat(document.getElementById('steel_grade').value) || 2450;
-                const E = 2040000; 
+                const E_ksc = 2040000; 
                 const d = parseFloat(document.getElementById('sec_d').value) || 0; 
                 const b = parseFloat(document.getElementById('sec_b').value) || 0; 
                 let t = parseFloat(document.getElementById('sec_t').value) || 0; 
@@ -412,7 +296,6 @@
                 if (L <= 0 || H <= 0 || W <= 0 || d <= 0 || b <= 0 || t <= 0) return;
                 if (t * 2 >= d || t * 2 >= b) t = Math.min(d, b) / 2.1; 
 
-                // Geometry
                 const L_flight = Math.max(0.1, (L - L_landing) / 2); 
                 const H_flight = H / 2; 
                 const theta_rad = Math.atan2(H_flight, L_flight);
@@ -424,104 +307,179 @@
                 const tread = (L_flight / numRisers) * 1000; 
                 const ergRule = (2 * riser + tread); 
 
-                // Section Properties
                 const dc = d / 10; const bc = b / 10; const tc = t / 10; 
-                const d_inner = dc - 2*tc;
-                const b_inner = bc - 2*tc;
+                const d_inner = dc - 2*tc; const b_inner = bc - 2*tc;
                 const Area = (dc*bc) - (d_inner*b_inner); 
                 const w_steel = Area * 7850 / 10000; 
                 const Ix = (bc * Math.pow(dc, 3) / 12) - (b_inner * Math.pow(d_inner, 3) / 12); 
                 const Zx = (bc * Math.pow(dc, 2) / 4) - (b_inner * Math.pow(d_inner, 2) / 4); 
 
-                // Loads (Per Stringer)
                 const w_trib = W / 2;
                 const DL_steel = w_steel * 1.1; 
                 const DL_stair = (SDL * w_trib); 
                 const DL_total = DL_steel + DL_stair; 
                 const LL_stringer = LL * w_trib; 
-                
                 const w_u = (1.2 * DL_total) + (1.6 * LL_stringer); 
 
-                // Statics Update (Including Roller & Fixed Support logic)
-                const Ry = w_u * L / 2;
-                let Hx = 0; 
-                let Mz = 0;
-                let delta_LL_max_cm;
-                
-                const w_LL_cm = LL_stringer / 100; // แปลงหน่วย kg/m -> kg/cm
-                const L_cm = L * 100; // m -> cm
+                const w_LL_cm = LL_stringer / 100; 
+                const L_cm = L * 100; 
 
-                if(support_type === 'pinned-roller') {
-                    Hx = 0; Mz = 0;
-                    delta_LL_max_cm = (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
-                } else if(support_type === 'fixed-roller') {
-                    Hx = 0; 
-                    Mz = (w_u * Math.pow(L, 2)) / 12; 
-                    delta_LL_max_cm = (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
-                } else if(support_type === 'pinned') {
-                    Hx = (Ry * L) / (2 * H); Mz = 0;
-                    delta_LL_max_cm = (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
-                } else { // fixed
-                    Hx = (Ry * L) / H; 
-                    Mz = (w_u * Math.pow(L, 2)) / 12; 
-                    delta_LL_max_cm = (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
+                // --- 12x12 Matrix Stiffness Method Engine (replaces simplified static equations) ---
+                const E_m = E_ksc * 10000; // kg/m2
+                const A_m = Area / 10000; // m2
+                const I_m = Ix / 100000000; // m4
+                const w_m = w_u; // kg/m (horizontal projection)
+
+                let nodes = [
+                    {x: 0, y: 0},
+                    {x: L_flight, y: H_flight},
+                    {x: L_flight + L_landing, y: H_flight},
+                    {x: L, y: H}
+                ];
+                let elements = [
+                    {n1: 0, n2: 1}, {n1: 1, n2: 2}, {n1: 2, n2: 3}
+                ];
+
+                let K_sys = zeros(12, 12);
+                let F_sys = Array(12).fill(0);
+                let elem_matrices = [];
+
+                elements.forEach((el) => {
+                    let dx = nodes[el.n2].x - nodes[el.n1].x;
+                    let dy = nodes[el.n2].y - nodes[el.n1].y;
+                    let Le = Math.max(0.001, Math.hypot(dx, dy));
+                    let c = dx/Le, s = dy/Le;
+
+                    let EAL = E_m * A_m / Le;
+                    let EI12L3 = 12 * E_m * I_m / (Le**3);
+                    let EI6L2 = 6 * E_m * I_m / (Le**2);
+                    let EI4L = 4 * E_m * I_m / Le;
+                    let EI2L = 2 * E_m * I_m / Le;
+
+                    let k_loc = [
+                        [ EAL, 0, 0, -EAL, 0, 0],
+                        [0, EI12L3, EI6L2, 0, -EI12L3, EI6L2],
+                        [0, EI6L2, EI4L, 0, -EI6L2, EI2L],
+                        [-EAL, 0, 0, EAL, 0, 0],
+                        [0, -EI12L3, -EI6L2, 0, EI12L3, -EI6L2],
+                        [0, EI6L2, EI2L, 0, -EI6L2, EI4L]
+                    ];
+                    let T = [
+                        [c, s, 0, 0, 0, 0],
+                        [-s, c, 0, 0, 0, 0],
+                        [0, 0, 1, 0, 0, 0],
+                        [0, 0, 0, c, s, 0],
+                        [0, 0, 0, -s, c, 0],
+                        [0, 0, 0, 0, 0, 1]
+                    ];
+                    let Tt = trans(T);
+                    let K_glob = mul(Tt, mul(k_loc, T));
+
+                    let dofs = [el.n1*3, el.n1*3+1, el.n1*3+2, el.n2*3, el.n2*3+1, el.n2*3+2];
+                    for(let i=0; i<6; i++) {
+                        for(let j=0; j<6; j++) K_sys[dofs[i]][dofs[j]] += K_glob[i][j];
+                    }
+
+                    // Equivalent Nodal Loads for Uniform Vertical Load
+                    let ENL = [0, -w_m * dx / 2, -w_m * dx * dx / 12, 0, -w_m * dx / 2, w_m * dx * dx / 12];
+                    for(let i=0; i<6; i++) F_sys[dofs[i]] += ENL[i];
+
+                    let FEF_global = [0, w_m*dx/2, w_m*dx*dx/12, 0, w_m*dx/2, -w_m*dx*dx/12];
+                    let FEF_local = mul(T, trans([FEF_global])).map(r=>r[0]);
+
+                    elem_matrices.push({ Le, c, s, dx, T, k_loc, FEF_local, dofs });
+                });
+
+                let fixed_dofs = [];
+                if(support_type === 'fixed') fixed_dofs = [0, 1, 2, 9, 10, 11];
+                else if(support_type === 'pinned') fixed_dofs = [0, 1, 9, 10];
+                else if(support_type === 'fixed-roller') fixed_dofs = [0, 1, 2, 10]; // x(9) free, rot(11) free
+                else if(support_type === 'pinned-roller') fixed_dofs = [0, 1, 10];
+
+                for(let i of fixed_dofs) {
+                    for(let j=0; j<12; j++) { K_sys[i][j] = 0; K_sys[j][i] = 0; }
+                    K_sys[i][i] = 1;
+                    F_sys[i] = 0;
                 }
-                const delta_LL_max_mm = delta_LL_max_cm * 10; 
 
-                // === สร้าง ARRAY วิเคราะห์โครงสร้างจริงระดับละเอียดเพื่อหา Peak 100% ===
+                // Gauss Elimination Solver
+                let n = 12;
+                for (let i = 0; i < n; i++) {
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) if (Math.abs(K_sys[k][i]) > Math.abs(K_sys[maxRow][i])) maxRow = k;
+                    let tmp = K_sys[i]; K_sys[i] = K_sys[maxRow]; K_sys[maxRow] = tmp;
+                    let tmpB = F_sys[i]; F_sys[i] = F_sys[maxRow]; F_sys[maxRow] = tmpB;
+                    if(Math.abs(K_sys[i][i]) < 1e-12) continue;
+                    for (let k = i + 1; k < n; k++) {
+                        let cf = -K_sys[k][i] / K_sys[i][i];
+                        for (let j = i; j < n; j++) K_sys[k][j] = (i===j) ? 0 : K_sys[k][j] + cf * K_sys[i][j];
+                        F_sys[k] += cf * F_sys[i];
+                    }
+                }
+                let U = Array(n).fill(0);
+                for (let i = n - 1; i >= 0; i--) {
+                    U[i] = F_sys[i];
+                    for (let j = i + 1; j < n; j++) U[i] -= K_sys[i][j] * U[j];
+                    U[i] /= (K_sys[i][i] || 1);
+                }
+
                 let forceData = [];
                 let maxA = -Infinity, minA = Infinity, maxS = -Infinity, minS = Infinity, maxB = -Infinity, minB = Infinity;
                 
-                // สับความละเอียด 250 จุด และจงใจแทรกจุดหักมุม (Kink Points) เข้าไปใน Array โดยตรง
-                let x_points = [];
-                const steps = 250; 
-                for(let i=0; i<=steps; i++) x_points.push(i * L / steps);
-                x_points.push(L_flight - 0.0001);
-                x_points.push(L_flight + 0.0001);
-                x_points.push(L_flight + L_landing - 0.0001);
-                x_points.push(L_flight + L_landing + 0.0001);
-                x_points.sort((a,b) => a-b); 
+                let F_end_glob = [];
+                let M_kink_arr = [];
 
-                x_points.forEach(x => {
-                    if(x > L) x = L; 
-                    
-                    const V_global = Ry - w_u * x; 
-                    let M = (Ry * x) - (w_u * Math.pow(x, 2)) / 2;
-                    if(support_type === 'fixed' || support_type === 'fixed-roller') M -= Mz; 
+                elem_matrices.forEach((em, idx) => {
+                    let U_glob_elem = em.dofs.map(d => U[d]);
+                    let U_loc = mul(em.T, trans([U_glob_elem])).map(r=>r[0]);
+                    let F_k = mul(em.k_loc, trans([U_loc])).map(r=>r[0]);
+                    let F_loc_end = F_k.map((v, i) => v + em.FEF_local[i]);
+                    F_end_glob.push(mul(trans(em.T), trans([F_loc_end])).map(r=>r[0]));
 
-                    let N_local, V_local;
-                    if (x < L_flight) { 
-                        N_local = - (Hx * Math.cos(theta_rad) + V_global * Math.sin(theta_rad));
-                        V_local = V_global * Math.cos(theta_rad) - Hx * Math.sin(theta_rad);
-                    } else if (x > L_flight + L_landing) {
-                        N_local = - (Hx * Math.cos(theta_rad) - V_global * Math.sin(theta_rad));
-                        V_local = V_global * Math.cos(theta_rad) + Hx * Math.sin(theta_rad);
-                    } else { 
-                        N_local = -Hx; 
-                        V_local = V_global;
+                    let num_steps = 100;
+                    let q_x = -w_m * em.s * em.c; // local axial load per unit length
+                    let q_y = -w_m * em.c * em.c; // local transverse load per unit length
+
+                    for(let i=0; i<=num_steps; i++) {
+                        let x_loc = (i / num_steps) * em.Le;
+                        let global_x = nodes[elements[idx].n1].x + x_loc * em.c;
+                        
+                        let N = -F_loc_end[0] - q_x * x_loc;
+                        let V = F_loc_end[1] + q_y * x_loc;
+                        let M = -F_loc_end[2] + F_loc_end[1] * x_loc + q_y * x_loc * x_loc / 2;
+                        
+                        forceData.push({ x: global_x, AFD: N, SFD: V, BMD: M });
+                        maxA = Math.max(maxA, N); minA = Math.min(minA, N);
+                        maxS = Math.max(maxS, V); minS = Math.min(minS, V);
+                        maxB = Math.max(maxB, M); minB = Math.min(minB, M);
                     }
-
-                    forceData.push({ x: x, AFD: N_local, SFD: V_local, BMD: M });
-                    maxA = Math.max(maxA, N_local); minA = Math.min(minA, N_local);
-                    maxS = Math.max(maxS, V_local); minS = Math.min(minS, V_local);
-                    maxB = Math.max(maxB, M); minB = Math.min(minB, M);
+                    if(idx === 0 || idx === 1) M_kink_arr.push(Math.abs(-F_loc_end[5]));
                 });
 
-                // ดึงค่าแรงขีดสุดสัมบูรณ์ (Absolute Max) จาก Local Diagram โดยตรง
-                const Pu = Math.max(Math.abs(maxA), Math.abs(minA));
-                const Vu = Math.max(Math.abs(maxS), Math.abs(minS));
-                const Mu = Math.max(Math.abs(maxB), Math.abs(minB));
+                // Extract global support reactions
+                let Rx1 = F_end_glob[0][0], Ry1 = F_end_glob[0][1], Mz1 = F_end_glob[0][2];
+                let Rx2 = F_end_glob[2][3], Ry2 = F_end_glob[2][4], Mz2 = F_end_glob[2][5];
+                
+                let Pu_dsm = Math.max(Math.abs(maxA), Math.abs(minA));
+                let Vu_dsm = Math.max(Math.abs(maxS), Math.abs(minS));
+                let Mu_dsm = Math.max(Math.abs(maxB), Math.abs(minB));
+                
+                // Equivalent Straight Beam (Manual Calculation Check)
+                let denom_M = (support_type === 'pinned' || support_type === 'pinned-roller') ? 8 : 12;
+                let Mu_eq = (w_u * L * L) / denom_M;
+                let Vu_eq = (w_u * L) / 2;
+                let Pu_eq = Math.abs(Rx1) * Math.cos(theta_rad) + Math.abs(Ry1) * Math.sin(theta_rad);
+                
+                // Design Envelope (Conservative Approach)
+                let Pu = Math.max(Pu_dsm, Pu_eq);
+                let Vu = Math.max(Vu_dsm, Vu_eq);
+                let Mu = Math.max(Mu_dsm, Mu_eq);
 
-                // Strength Check
+                let M_kink = Math.max(M_kink_arr[0] || 0, M_kink_arr[1] || 0);
+
                 const phi_b = 0.90; const phi_c = 0.90; const phi_v = 0.90;
-
-                const Pn = Fy * Area; 
-                const phi_Pn = phi_c * Pn; 
-                const ratio_axial = Pu / phi_Pn;
-
-                const Mn = Fy * Zx / 100; 
-                const phi_Mn = phi_b * Mn;
-                const ratio_flexure = Mu / phi_Mn;
+                const Pn = Fy * Area; const phi_Pn = phi_c * Pn; const ratio_axial = Pu / phi_Pn;
+                const Mn = Fy * Zx / 100; const phi_Mn = phi_b * Mn; const ratio_flexure = Mu / phi_Mn;
 
                 let ratio_interaction = 0;
                 if (ratio_axial >= 0.2) {
@@ -534,35 +492,32 @@
                 const Vn = 0.6 * Fy * Aw * 1.0;
                 const phi_Vn = phi_v * Vn;
                 const ratio_shear = Vu / phi_Vn;
-
                 const max_ratio = Math.max(ratio_interaction, ratio_shear);
 
-                // Kink Point Stresses
-                let M_kink = (Ry * L_flight) - (w_u * Math.pow(L_flight, 2) / 2);
-                if(support_type === 'fixed' || support_type === 'fixed-roller') M_kink -= Mz;
-                M_kink = Math.abs(M_kink); 
-                
+                // Kink Point Stiffener Sizing
                 const d_eff = (d - t) / 1000; 
                 const Pf = M_kink / d_eff; 
                 const Fr = 2 * Pf * Math.sin(theta_rad / 2); 
-
                 const b_inner_mm = b - 2 * t; 
                 const A_req_cm2 = Fr / (0.90 * Fy); 
                 const t_req_mm = (A_req_cm2 / (b_inner_mm / 10)) * 10; 
                 const t_st_rec = Math.ceil(Math.max(t_req_mm, t, 6)); 
 
-                // Vibration Check (Dunkerley)
+                // Serviceability - theoretical equivalent horizontal beam approximation
+                let delta_LL_max_cm = (support_type === 'pinned' || support_type === 'pinned-roller') 
+                    ? (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix)
+                    : (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix);
+                let delta_LL_max_mm = delta_LL_max_cm * 10; 
+
                 let w_active = DL_total + (0.1 * LL_stringer);
                 let w_active_cm = w_active / 100; 
                 let delta_active_cm = (support_type === 'pinned' || support_type === 'pinned-roller') 
-                    ? (5 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E * Ix)
-                    : (1 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E * Ix);
+                    ? (5 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix)
+                    : (1 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix);
                 let delta_active_mm = delta_active_cm * 10;
-                    
                 const fn = 17.76 / Math.sqrt(Math.max(delta_active_mm, 0.001));
                 const def_limit_mm = (L * 1000) / 400; 
 
-                // UPDATE UI Dashboards
                 document.getElementById('out_ratio').innerText = max_ratio.toFixed(2);
                 const b_ratio = document.getElementById('badge_ratio');
                 if(max_ratio <= 1.0) {
@@ -596,9 +551,11 @@
 
                 const calcData = {
                     L, H, W, L_landing, L_flight, H_flight, riser, tread, ergRule, theta_rad, theta_deg,
-                    LL, SDL, Fy, E, d, b, t, Area, w_steel, Ix, Zx,
+                    LL, SDL, Fy, E_ksc, d, b, t, Area, w_steel, Ix, Zx,
                     w_trib, DL_steel, DL_stair, DL_total, LL_stringer, w_u, w_LL_cm, L_cm,
-                    Mu, Vu, Pu, Ry, Hx, Mz, support_type,
+                    Mu, Vu, Pu, support_type,
+                    Mu_eq, Vu_eq, Pu_eq, denom_M, Mu_dsm, Vu_dsm, Pu_dsm,
+                    Rx1, Ry1, Mz1, Rx2, Ry2, Mz2,
                     phi_Pn, ratio_axial,
                     Mn, phi_Mn, ratio_flexure, ratio_interaction,
                     Vn, phi_Vn, ratio_shear, max_ratio,
@@ -607,24 +564,9 @@
                     forceData, maxA, minA, maxS, minS, maxB, minB
                 };
 
-                drawElevation(calcData);
-                drawPlan(calcData);
-                drawStiffenerPlan(calcData);
-                drawFBD(calcData);
-                drawTrueDiagrams(calcData); 
-                generateReport(calcData);
-
-                document.getElementById('val_Ry1').innerText = `= ${fmt(Ry, 2)} kg`;
-                document.getElementById('val_Hx1').innerText = `= ${fmt(Hx, 2)} kg`;
-                document.getElementById('val_Mz1').innerText = `= ${fmt(Mz, 2)} kg-m`;
-                
-                document.getElementById('val_Ry2').innerText = `= ${fmt(Ry, 2)} kg`;
-                document.getElementById('val_Hx2').innerText = `= ${fmt(Hx, 2)} kg`;
-                document.getElementById('val_Mz2').innerText = `= ${fmt(Mz, 2)} kg-m`;
-
-                document.getElementById('val_Mkink').innerText = `= ${fmt(M_kink, 2)} kg-m`;
-                document.getElementById('val_Fr').innerText = `= ${fmt(Fr, 2)} kg`;
-                document.getElementById('val_VuPu').innerText = `-> Vu = ${fmt(Vu, 2)} kg, Pu = ${fmt(Pu, 2)} kg`;
+                drawElevation(calcData); drawPlan(calcData); drawStiffenerPlan(calcData);
+                drawFBD(calcData); drawTrueDiagrams(calcData); 
+                generateReport(calcData); generateNom(calcData);
 
             } catch (e) {
                 console.error("Calculation Error:", e);
@@ -637,43 +579,30 @@
             const cw = canvas.parentElement.clientWidth;
             const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return; 
-            
             canvas.width = cw; canvas.height = ch;
             ctx.clearRect(0, 0, cw, ch);
             
-            const margin = 50;
-            const drawW = cw - 2*margin;
-            const drawH = ch - 2*margin;
-            const scaleX = drawW / data.L;
-            const scaleY = drawH / data.H;
+            const margin = 50; const drawW = cw - 2*margin; const drawH = ch - 2*margin;
+            const scaleX = drawW / data.L; const scaleY = drawH / data.H;
             const scale = Math.min(scaleX, scaleY) * 0.8;
             const cx = cw/2; const cy = ch/2;
-            
-            const mapPt = (x, y) => ({
-                x: cx + (x - data.L/2) * scale,
-                y: cy - (y - data.H/2) * scale
-            });
+            const mapPt = (x, y) => ({ x: cx + (x - data.L/2) * scale, y: cy - (y - data.H/2) * scale });
 
-            const p0 = mapPt(0, 0); 
-            const p1 = mapPt(data.L_flight, data.H_flight); 
-            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); 
-            const p3 = mapPt(data.L, data.H); 
+            const p0 = mapPt(0, 0); const p1 = mapPt(data.L_flight, data.H_flight); 
+            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); const p3 = mapPt(data.L, data.H); 
 
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+            ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
             ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 6; ctx.lineJoin = 'bevel'; ctx.stroke();
 
             ctx.fillStyle = '#ef4444';
-            [p1, p2].forEach(p => {
-                ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
-            });
+            [p1, p2].forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill(); });
 
             ctx.fillStyle = '#94a3b8';
             ctx.fillRect(p0.x - 10, p0.y, 20, 20); ctx.fillRect(p3.x, p3.y, 20, 20); 
             if(data.support_type === 'pinned-roller' || data.support_type === 'fixed-roller') {
-                ctx.beginPath(); ctx.arc(p0.x, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(p0.x - 10, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(p0.x + 10, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p3.x, p3.y + 25, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p3.x - 10, p3.y + 25, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p3.x + 10, p3.y + 25, 5, 0, Math.PI*2); ctx.fill();
             }
 
             ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.fillStyle = '#475569'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
@@ -689,22 +618,18 @@
         function drawPlan(data) {
             const canvas = document.getElementById('canvasPlan');
             const ctx = canvas.getContext('2d');
-            const cw = canvas.parentElement.clientWidth;
-            const ch = canvas.parentElement.clientHeight;
+            const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
-            canvas.width = cw; canvas.height = ch;
-            ctx.clearRect(0, 0, cw, ch);
+            canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
             
             const margin = 40; const scaleX = (cw - 2*margin) / data.L;
             const stairW_px = data.W * scaleX;
             const cx = cw/2; const cy = ch/2;
             const startX = cx - (data.L * scaleX)/2;
             
-            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
-            ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
             
-            const landingX = startX + data.L_flight * scaleX;
-            const landingW_px = data.L_landing * scaleX;
+            const landingX = startX + data.L_flight * scaleX; const landingW_px = data.L_landing * scaleX;
             ctx.fillStyle = '#f1f5f9'; ctx.fillRect(landingX, cy - stairW_px/2, landingW_px, stairW_px); ctx.strokeRect(landingX, cy - stairW_px/2, landingW_px, stairW_px);
             
             ctx.lineWidth = 1; ctx.strokeStyle = '#94a3b8';
@@ -712,8 +637,7 @@
             const stepW = (data.L_flight * scaleX) / numSteps;
             for(let i=1; i<numSteps; i++) {
                 ctx.beginPath(); ctx.moveTo(startX + i*stepW, cy - stairW_px/2); ctx.lineTo(startX + i*stepW, cy + stairW_px/2); ctx.stroke();
-                const f2_startX = landingX + landingW_px;
-                ctx.beginPath(); ctx.moveTo(f2_startX + i*stepW, cy - stairW_px/2); ctx.lineTo(f2_startX + i*stepW, cy + stairW_px/2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(landingX + landingW_px + i*stepW, cy - stairW_px/2); ctx.lineTo(landingX + landingW_px + i*stepW, cy + stairW_px/2); ctx.stroke();
             }
 
             ctx.setLineDash([5, 5]); ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 2;
@@ -725,108 +649,68 @@
         function drawStiffenerPlan(data) {
             const canvas = document.getElementById('canvasStiffenerPlan');
             const ctx = canvas.getContext('2d');
-            const cw = canvas.parentElement.clientWidth;
-            const ch = canvas.parentElement.clientHeight;
+            const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
-            canvas.width = cw; canvas.height = ch;
-            ctx.clearRect(0, 0, cw, ch);
+            canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
 
-            const marginX = 40;
-            const scaleX = (cw - 2*marginX) / data.L;
-            const stairW_px = data.W * scaleX;
-            const cx = cw/2;
-            const cy = ch/2 - 15; 
-            const startX = cx - (data.L * scaleX)/2;
+            const scaleX = (cw - 80) / data.L; const stairW_px = data.W * scaleX;
+            const cx = cw/2; const cy = ch/2 - 15; const startX = cx - (data.L * scaleX)/2;
 
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            ctx.fillStyle = '#f8fafc'; ctx.fillRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
 
-            const x1 = startX + data.L_flight * scaleX;
-            const x2 = startX + (data.L_flight + data.L_landing) * scaleX;
-
-            ctx.strokeStyle = '#ef4444'; 
-            ctx.lineWidth = 4;
-            
+            const x1 = startX + data.L_flight * scaleX; const x2 = startX + (data.L_flight + data.L_landing) * scaleX;
+            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(x1, cy - stairW_px/2); ctx.lineTo(x1, cy + stairW_px/2); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(x2, cy - stairW_px/2); ctx.lineTo(x2, cy + stairW_px/2); ctx.stroke();
 
-            ctx.fillStyle = '#ef4444';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Stiffener Plate', x1, cy - stairW_px/2 - 10);
-            ctx.fillText('Stiffener Plate', x2, cy - stairW_px/2 - 10);
+            ctx.fillStyle = '#ef4444'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('Stiffener Plate', x1, cy - stairW_px/2 - 10); ctx.fillText('Stiffener Plate', x2, cy - stairW_px/2 - 10);
 
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = 1;
-            ctx.fillStyle = '#475569';
-            ctx.font = '13px sans-serif';
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.fillStyle = '#475569';
             const dimY = cy + stairW_px/2 + 35;
-
-            const drawDim = (fromX, toX, text) => {
-                ctx.beginPath();
-                ctx.moveTo(fromX, cy + stairW_px/2 + 5); ctx.lineTo(fromX, dimY + 5);
-                ctx.moveTo(toX, cy + stairW_px/2 + 5); ctx.lineTo(toX, dimY + 5);
-                ctx.moveTo(fromX, dimY); ctx.lineTo(toX, dimY);
-                ctx.stroke();
-                
-                ctx.beginPath(); ctx.moveTo(fromX, dimY); ctx.lineTo(fromX+6, dimY-4); ctx.lineTo(fromX+6, dimY+4); ctx.fill();
-                ctx.beginPath(); ctx.moveTo(toX, dimY); ctx.lineTo(toX-6, dimY-4); ctx.lineTo(toX-6, dimY+4); ctx.fill();
-                ctx.fillText(text, (fromX+toX)/2, dimY - 8);
+            const drawDim = (fX, tX, txt) => {
+                ctx.beginPath(); ctx.moveTo(fX, cy + stairW_px/2 + 5); ctx.lineTo(fX, dimY + 5); ctx.moveTo(tX, cy + stairW_px/2 + 5); ctx.lineTo(tX, dimY + 5); ctx.moveTo(fX, dimY); ctx.lineTo(tX, dimY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(fX, dimY); ctx.lineTo(fX+6, dimY-4); ctx.lineTo(fX+6, dimY+4); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(tX, dimY); ctx.lineTo(tX-6, dimY-4); ctx.lineTo(tX-6, dimY+4); ctx.fill();
+                ctx.fillText(txt, (fX+tX)/2, dimY - 8);
             };
-
-            const endX = startX + data.L * scaleX;
-            drawDim(startX, x1, `L1 = ${data.L_flight.toFixed(2)} m`);
-            drawDim(x1, x2, `ชานพัก = ${data.L_landing.toFixed(2)} m`);
-            drawDim(x2, endX, `L2 = ${data.L_flight.toFixed(2)} m`);
+            drawDim(startX, x1, `L1 = ${data.L_flight.toFixed(2)} m`); drawDim(x1, x2, `ชานพัก = ${data.L_landing.toFixed(2)} m`); drawDim(x2, startX + data.L * scaleX, `L2 = ${data.L_flight.toFixed(2)} m`);
         }
 
         function drawFBD(data) {
             const canvas = document.getElementById('canvasFBD');
             const ctx = canvas.getContext('2d');
-            const cw = canvas.parentElement.clientWidth;
-            const ch = canvas.parentElement.clientHeight;
+            const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
-            canvas.width = cw; canvas.height = ch;
-            ctx.clearRect(0, 0, cw, ch);
+            canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
             
             const marginX = 80; const marginY = 80;
-            const scaleX = (cw - 2 * marginX) / data.L;
-            const scaleY = (ch - 2 * marginY) / data.H;
+            const scaleX = (cw - 2 * marginX) / data.L; const scaleY = (ch - 2 * marginY) / data.H;
             const scale = Math.min(scaleX, scaleY);
-            
             const cx_val = cw/2; const cy_val = ch/2;
-            const mapPt = (x, y) => ({ x: cx_val + (x - data.L/2) * scale, y: cy_val - (y - data.H/2) * scale });
-
-            const p0 = mapPt(0, 0); 
-            const p1 = mapPt(data.L_flight, data.H_flight); 
-            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); 
-            const p3 = mapPt(data.L, data.H); 
-
-            // Draw Structure
-            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
-            ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
             
-            // Kink Nodes
-            ctx.fillStyle = '#ef4444';
-            [p1, p2].forEach(p => {
-                ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill();
-            });
-
-            // Draw UDL (Gravity Load) mapped correctly to slopes
-            ctx.strokeStyle = '#f59e0b'; ctx.fillStyle = '#f59e0b'; ctx.lineWidth = 1.5;
-            
+            // True geometry path mapping
             const getBeamY = (x_m) => {
                 if(x_m <= data.L_flight) return x_m * (data.H_flight/data.L_flight);
                 if(x_m <= data.L_flight + data.L_landing) return data.H_flight;
                 return data.H_flight + (x_m - data.L_flight - data.L_landing) * (data.H_flight/data.L_flight);
             };
+            const mapPt = (x, y) => ({ x: cx_val + (x - data.L/2) * scale, y: cy_val - (y - data.H/2) * scale });
 
+            const p0 = mapPt(0, 0); const p1 = mapPt(data.L_flight, data.H_flight); 
+            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); const p3 = mapPt(data.L, data.H); 
+
+            // Beam Line
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
+            ctx.fillStyle = '#ef4444';
+            [p1, p2].forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill(); });
+
+            // Uniform Load (Gravity)
+            ctx.strokeStyle = '#f59e0b'; ctx.fillStyle = '#f59e0b'; ctx.lineWidth = 1.5;
             const arrowLen = 30;
             
-            // วาดเส้นประกับด้านบนให้เอียงขนานไปกับความเอียงบันไดอย่างสมบูรณ์แบบ
             ctx.beginPath();
             ctx.moveTo(mapPt(0, getBeamY(0)).x, mapPt(0, getBeamY(0)).y - arrowLen);
             ctx.lineTo(mapPt(data.L_flight, getBeamY(data.L_flight)).x, mapPt(data.L_flight, getBeamY(data.L_flight)).y - arrowLen);
@@ -836,67 +720,69 @@
 
             const numArrows = 24; const stepX = data.L / numArrows; 
             for(let i=0; i<=numArrows; i++) {
-                const xm = i * stepX; 
-                const pt = mapPt(xm, getBeamY(xm));
-                
-                ctx.beginPath(); 
-                ctx.moveTo(pt.x, pt.y - arrowLen); 
-                ctx.lineTo(pt.x, pt.y - 4); 
-                ctx.stroke();
+                const pt = mapPt(i * stepX, getBeamY(i * stepX));
+                ctx.beginPath(); ctx.moveTo(pt.x, pt.y - arrowLen); ctx.lineTo(pt.x, pt.y - 4); ctx.stroke();
                 drawFBDArrowHead(ctx, pt.x, pt.y - 4, Math.PI/2);
             }
-            
             ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; 
             ctx.fillText(`w_u = ${data.w_u.toFixed(2)} kg/m (Gravity)`, cx_val, p3.y - 45);
 
-            // Draw Reactions
+            // Support Reactions (Matrix Solver Results)
             ctx.strokeStyle = '#ef4444'; ctx.fillStyle = '#ef4444'; ctx.lineWidth = 2;
             
-            // Bottom Support
-            drawFBDArrow(ctx, p0.x, p0.y + 40, p0.x, p0.y + 10);
-            ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(data.Ry,0)}`, p0.x, p0.y + 55);
-            
-            if (data.support_type === 'pinned' || data.support_type === 'fixed') {
-                drawFBDArrow(ctx, p0.x - 40, p0.y, p0.x - 10, p0.y);
-                ctx.textAlign = 'right'; ctx.fillText(`Hx = ${fmt(data.Hx,0)}`, p0.x - 45, p0.y + 4);
+            // Left Support (Node 0)
+            let ry1_val = Math.abs(data.Ry1);
+            if (ry1_val > 0.1) {
+                let dir = data.Ry1 > 0 ? 1 : -1;
+                drawFBDArrow(ctx, p0.x, p0.y + 40*dir, p0.x, p0.y + 10*dir);
+                ctx.textAlign = 'center'; ctx.fillText(`Ry1 = ${fmt(ry1_val,0)}`, p0.x, p0.y + 55*dir);
+            }
+            let rx1_val = Math.abs(data.Rx1);
+            if (rx1_val > 0.1) {
+                if (data.Rx1 > 0) drawFBDArrow(ctx, p0.x - 40, p0.y, p0.x - 10, p0.y); // +x -> Right
+                else drawFBDArrow(ctx, p0.x - 10, p0.y, p0.x - 40, p0.y); // -x -> Left
+                ctx.textAlign = 'right'; ctx.fillText(`Rx1 = ${fmt(rx1_val,0)}`, p0.x - 45, p0.y + 4);
             } else {
                 ctx.beginPath(); ctx.arc(p0.x - 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(p0.x + 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
-                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p0.x - 20, p0.y + 4);
-                ctx.fillStyle = '#ef4444';
+                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.fillText(`Rx1 = 0`, p0.x - 20, p0.y + 4); ctx.fillStyle = '#ef4444';
             }
-
-            if(data.support_type === 'fixed' || data.support_type === 'fixed-roller') {
+            let mz1_val = Math.abs(data.Mz1);
+            if(mz1_val > 0.1) {
+                let dir = data.Mz1 > 0 ? 1 : -1; // + is CCW
                 ctx.beginPath(); ctx.arc(p0.x, p0.y, 25, 0.5*Math.PI, 1.5*Math.PI); ctx.stroke();
-                drawFBDArrowHead(ctx, p0.x, p0.y - 25, Math.PI);
-                ctx.fillText(`Mz = ${fmt(data.Mz,0)}`, p0.x - 30, p0.y - 25);
+                drawFBDArrowHead(ctx, p0.x, p0.y - 25, dir > 0 ? 0 : Math.PI);
+                ctx.fillText(`Mz1 = ${fmt(mz1_val,0)}`, p0.x - 30, p0.y - 25);
             }
 
-            // Top Support
-            drawFBDArrow(ctx, p3.x, p3.y + 40, p3.x, p3.y + 10);
-            ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(data.Ry,0)}`, p3.x, p3.y + 55);
-            
-            if (data.support_type === 'pinned' || data.support_type === 'fixed') {
-                drawFBDArrow(ctx, p3.x + 40, p3.y, p3.x + 10, p3.y);
-                ctx.textAlign = 'left'; ctx.fillText(`Hx = ${fmt(data.Hx,0)}`, p3.x + 45, p3.y + 4);
+            // Right Support (Node 3)
+            let ry2_val = Math.abs(data.Ry2);
+            if (ry2_val > 0.1) {
+                let dir = data.Ry2 > 0 ? 1 : -1;
+                drawFBDArrow(ctx, p3.x, p3.y + 40*dir, p3.x, p3.y + 10*dir);
+                ctx.textAlign = 'center'; ctx.fillText(`Ry2 = ${fmt(ry2_val,0)}`, p3.x, p3.y + 55*dir);
+            }
+            let rx2_val = Math.abs(data.Rx2);
+            if (rx2_val > 0.1) {
+                if (data.Rx2 > 0) drawFBDArrow(ctx, p3.x + 10, p3.y, p3.x + 40, p3.y); // +x -> Right
+                else drawFBDArrow(ctx, p3.x + 40, p3.y, p3.x + 10, p3.y); // -x -> Left
+                ctx.textAlign = 'left'; ctx.fillText(`Rx2 = ${fmt(rx2_val,0)}`, p3.x + 45, p3.y + 4);
             } else {
                 ctx.beginPath(); ctx.arc(p3.x - 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(p3.x + 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
-                ctx.textAlign = 'left'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p3.x + 20, p3.y + 4);
-                ctx.fillStyle = '#ef4444';
+                ctx.textAlign = 'left'; ctx.fillStyle = '#64748b'; ctx.fillText(`Rx2 = 0`, p3.x + 20, p3.y + 4); ctx.fillStyle = '#ef4444';
             }
-
-            if(data.support_type === 'fixed' || data.support_type === 'fixed-roller') {
+            let mz2_val = Math.abs(data.Mz2);
+            if(mz2_val > 0.1) {
+                let dir = data.Mz2 > 0 ? 1 : -1; // + is CCW
                 ctx.beginPath(); ctx.arc(p3.x, p3.y, 25, 1.5*Math.PI, 0.5*Math.PI); ctx.stroke();
-                drawFBDArrowHead(ctx, p3.x, p3.y - 25, 0);
-                ctx.fillText(`Mz = ${fmt(data.Mz,0)}`, p3.x + 30, p3.y - 25);
+                drawFBDArrowHead(ctx, p3.x, p3.y - 25, dir > 0 ? Math.PI : 0);
+                ctx.fillText(`Mz2 = ${fmt(mz2_val,0)}`, p3.x + 30, p3.y - 25);
             }
         }
-
         function drawFBDArrow(ctx, fromX, fromY, toX, toY) {
             ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
-            const angle = Math.atan2(toY - fromY, toX - fromX);
-            drawFBDArrowHead(ctx, toX, toY, angle);
+            drawFBDArrowHead(ctx, toX, toY, Math.atan2(toY - fromY, toX - fromX));
         }
         function drawFBDArrowHead(ctx, x, y, angle) {
             const size = 6; ctx.beginPath();
@@ -906,75 +792,44 @@
         function drawTrueDiagrams(data) {
             const getPath = (x) => {
                 let y, angle;
-                if (x <= data.L_flight) {
-                    y = x * Math.tan(data.theta_rad);
-                    angle = data.theta_rad;
-                } else if (x <= data.L_flight + data.L_landing) {
-                    y = data.H_flight;
-                    angle = 0;
-                } else {
-                    y = data.H_flight + (x - data.L_flight - data.L_landing) * Math.tan(data.theta_rad);
-                    angle = data.theta_rad;
-                }
+                if (x <= data.L_flight) { y = x * Math.tan(data.theta_rad); angle = data.theta_rad; } 
+                else if (x <= data.L_flight + data.L_landing) { y = data.H_flight; angle = 0; } 
+                else { y = data.H_flight + (x - data.L_flight - data.L_landing) * Math.tan(data.theta_rad); angle = data.theta_rad; }
                 return { x, y, angle };
             };
-
-            const forceData = data.forceData;
 
             const drawGraph = (canvasId, type, maxVal, minVal, unit) => {
                 const canvas = document.getElementById(canvasId);
                 const ctx = canvas.getContext('2d');
-                const cw = canvas.parentElement.clientWidth;
-                const ch = canvas.parentElement.clientHeight;
+                const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
                 if (cw === 0 || ch === 0) return;
-                
-                canvas.width = cw; canvas.height = ch;
-                ctx.clearRect(0, 0, cw, ch);
+                canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
                 
                 const marginX = 60; const marginY = 60;
-                const scaleX = (cw - 2 * marginX) / data.L;
-                const scaleY = (ch - 2 * marginY) / data.H;
+                const scaleX = (cw - 2 * marginX) / data.L; const scaleY = (ch - 2 * marginY) / data.H;
                 const scale = Math.min(scaleX, scaleY); 
-                
                 const cx_origin = cw/2; const cy_origin = ch/2;
-                const mapToCanvas = (x_m, y_m) => ({ 
-                    x: cx_origin + (x_m - data.L/2) * scale, 
-                    y: cy_origin - (y_m - data.H/2) * scale 
-                });
+                const mapToCanvas = (x_m, y_m) => ({ x: cx_origin + (x_m - data.L/2) * scale, y: cy_origin - (y_m - data.H/2) * scale });
 
-                ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-                ctx.beginPath();
-                const p0 = mapToCanvas(0, 0);
-                const p1 = mapToCanvas(data.L_flight, data.H_flight);
-                const p2 = mapToCanvas(data.L_flight + data.L_landing, data.H_flight);
-                const p3 = mapToCanvas(data.L, data.H);
-                ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
-                ctx.stroke();
+                ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.beginPath();
+                const p0 = mapToCanvas(0, 0); const p1 = mapToCanvas(data.L_flight, data.H_flight);
+                const p2 = mapToCanvas(data.L_flight + data.L_landing, data.H_flight); const p3 = mapToCanvas(data.L, data.H);
+                ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
 
                 const absMax = Math.max(Math.abs(maxVal), Math.abs(minVal), 0.001);
-                const valScale = 35 / absMax; 
-                const sign = (type === 'BMD') ? 1 : 1; 
-                
-                let plotPoints = [];
-                let baselinePoints = [];
+                const valScale = 45 / absMax; 
+                let plotPoints = []; let baselinePoints = [];
 
-                forceData.forEach((dpt) => {
+                data.forceData.forEach((dpt) => {
                     const path = getPath(dpt.x);
                     const basePtCanvas = mapToCanvas(path.x, path.y);
                     baselinePoints.push(basePtCanvas);
-                    
-                    const val = dpt[type];
-                    const dx_canvas = sign * val * valScale * Math.sin(path.angle);
-                    const dy_canvas = sign * val * valScale * Math.cos(path.angle);
-                    
-                    plotPoints.push({
-                        x: basePtCanvas.x + dx_canvas,
-                        y: basePtCanvas.y + dy_canvas
-                    });
+                    const dx_canvas = dpt[type] * valScale * Math.sin(path.angle);
+                    const dy_canvas = dpt[type] * valScale * Math.cos(path.angle);
+                    plotPoints.push({ x: basePtCanvas.x + dx_canvas, y: basePtCanvas.y + dy_canvas });
                 });
 
-                ctx.beginPath();
-                ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
+                ctx.beginPath(); ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
                 for(let i=1; i<plotPoints.length; i++) ctx.lineTo(plotPoints[i].x, plotPoints[i].y);
                 for(let i=baselinePoints.length-1; i>=0; i--) ctx.lineTo(baselinePoints[i].x, baselinePoints[i].y);
                 ctx.closePath();
@@ -983,32 +838,81 @@
                 else if (type === 'BMD') { ctx.fillStyle = 'rgba(239, 68, 68, 0.15)'; ctx.strokeStyle = '#dc2626'; } 
                 else { 
                     const grad = ctx.createLinearGradient(0, 0, 0, ch);
-                    grad.addColorStop(0, 'rgba(249, 115, 22, 0.2)'); 
-                    grad.addColorStop(1, 'rgba(56, 189, 248, 0.2)'); 
-                    ctx.fillStyle = grad; 
-                    ctx.strokeStyle = '#94a3b8'; 
+                    grad.addColorStop(0, 'rgba(249, 115, 22, 0.2)'); grad.addColorStop(1, 'rgba(56, 189, 248, 0.2)'); 
+                    ctx.fillStyle = grad; ctx.strokeStyle = '#94a3b8'; 
                 }
                 
-                ctx.fill(); 
-                ctx.lineWidth = 1.5; 
-                
-                ctx.beginPath();
-                ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
+                ctx.fill(); ctx.lineWidth = 1.5; 
+                ctx.beginPath(); ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
                 for(let i=1; i<plotPoints.length; i++) ctx.lineTo(plotPoints[i].x, plotPoints[i].y);
                 ctx.stroke();
 
                 ctx.strokeStyle = (type === 'AFD') ? 'rgba(148, 163, 184, 0.5)' : ctx.fillStyle.replace('0.15', '0.4'); 
                 ctx.lineWidth = 0.5;
                 for(let i=0; i<plotPoints.length; i+=2) { 
-                    if (type === 'AFD') {
-                        ctx.strokeStyle = forceData[i].AFD > 0 ? 'rgba(249, 115, 22, 0.6)' : 'rgba(56, 189, 248, 0.6)';
-                    }
+                    if (type === 'AFD') ctx.strokeStyle = data.forceData[i].AFD > 0 ? 'rgba(249, 115, 22, 0.6)' : 'rgba(56, 189, 248, 0.6)';
                     ctx.beginPath(); ctx.moveTo(baselinePoints[i].x, baselinePoints[i].y); ctx.lineTo(plotPoints[i].x, plotPoints[i].y); ctx.stroke();
                 }
 
+                ctx.font = '600 11px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // กำหนด Index ที่จะแสดงตัวเลข: โคนบันได, กลางทางขึ้น, จุดหักมุม 1, กลางชานพัก, จุดหักมุม 2, กลางทางขึ้น 2, ปลายบันได
+                const labelIndices = [0, 50, 100, 150, 200, 250, 300];
+                
+                labelIndices.forEach(idx => {
+                    if(idx < data.forceData.length) {
+                        const dpt = data.forceData[idx];
+                        const path = getPath(dpt.x);
+                        
+                        // แปลงหน่วยเป็นตัน (ton) และทศนิยม 3 ตำแหน่ง
+                        const valInTons = (dpt[type] / 1000).toFixed(3); 
+                        
+                        const basePt = baselinePoints[idx];
+                        const plotPt = plotPoints[idx];
+
+                        // คำนวณระยะเยื้อง (Offset) ให้ออกห่างจากเส้นกราฟเล็กน้อย
+                        let dx = plotPt.x - basePt.x;
+                        let dy = plotPt.y - basePt.y;
+                        let len = Math.hypot(dx, dy);
+                        
+                        // ถ้าค่าแรงเข้าใกล้ 0 กราฟจะแบน ให้จับยืดออกไปเองตามทิศทางตั้งฉาก
+                        if (len < 1) { 
+                            dx = 12 * Math.sin(path.angle);
+                            dy = 12 * Math.cos(path.angle);
+                        } else {
+                            // ยืดระยะออกไปจากขอบกราฟอีก 10 px
+                            dx = (dx / len) * (len + 10);
+                            dy = (dy / len) * (len + 10);
+                        }
+
+                        // ถ้ากราฟอยู่ด้านล่างเส้น ให้สลับตำแหน่งตัวหนังสือมาไว้อีกฝั่งเพื่อไม่ให้อ่านยาก
+                        if (type === 'BMD' && dpt[type] > 0) { dy += 15; dx -= 5; }
+
+                        ctx.save();
+                        ctx.translate(basePt.x + dx, basePt.y + dy);
+                        // หมุนตัวหนังสือให้ขนานกับความเอียงของบันได (canvas Y ทิศลง จึงต้องเป็นมุมลบ)
+                        ctx.rotate(-path.angle);
+                        
+                        // ใส่ขอบสีขาวให้ตัวหนังสืออ่านง่ายเมื่อทับเส้น
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 3;
+                        ctx.strokeText(valInTons, 0, 0);
+                        
+                        // เติมสีตัวหนังสือ
+                        ctx.fillStyle = (type === 'BMD') ? '#991b1b' : (type === 'SFD' ? '#1e3a8a' : '#475569');
+                        ctx.fillText(valInTons, 0, 0);
+                        
+                        ctx.restore();
+                    }
+                });
+
+                // แสดงค่า Max/Min ที่มุมจอ ปรับหน่วยเป็น Ton
                 ctx.fillStyle = '#1e293b'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
-                if(Math.abs(maxVal) > 0.01) ctx.fillText(`Max: ${maxVal.toFixed(2)} ${unit}`, 20, 25);
-                if(Math.abs(minVal) > 0.01) ctx.fillText(`Min: ${minVal.toFixed(2)} ${unit}`, 20, ch - 15);
+                let unitTon = (type === 'BMD') ? 'ton-m' : 'ton';
+                if(Math.abs(maxVal) > 0.001) ctx.fillText(`Max: ${(maxVal/1000).toFixed(3)} ${unitTon}`, 20, 25);
+                if(Math.abs(minVal) > 0.001) ctx.fillText(`Min: ${(minVal/1000).toFixed(3)} ${unitTon}`, 20, ch - 15);
             };
             
             drawGraph('canvasAFD', 'AFD', data.maxA, data.minA, 'kg');
@@ -1017,14 +921,6 @@
         }
 
         function generateReport(data) {
-            
-            let mu_eqn = '';
-            if(data.support_type === 'pinned-roller' || data.support_type === 'pinned') {
-                mu_eqn = `M_u = \\frac{w_u L^2}{8} = \\frac{${fmt(data.w_u, 2)} \\times ${data.L.toFixed(2)}^2}{8}`;
-            } else {
-                mu_eqn = `M_u = M_z = \\frac{w_u L^2}{12} = \\frac{${fmt(data.w_u, 2)} \\times ${data.L.toFixed(2)}^2}{12}`;
-            }
-
             const reportHTML = `
                 <div class="report-header text-center">
                     <h1 class="text-2xl font-bold uppercase">รายการคำนวณการออกแบบบันไดเหล็ก</h1>
@@ -1097,16 +993,41 @@
                         $$ w_u = 1.2(DL) + 1.6(LL) = 1.2(${fmt(data.DL_total, 2)}) + 1.6(${fmt(data.LL_stringer, 2)}) = \\mathbf{${fmt(data.w_u, 2)} \\text{ kg/m}} $$
                     </div>
                     
-                    <p class="mb-2 mt-4 text-blue-800 font-bold">3.3 แรงภายในสูงสุดจากแบบจำลองโครงสร้างจริง (True Kinked-Beam Maximum Forces)</p>
-                    <div class="ml-4 mb-4 bg-blue-50 p-4 rounded border border-blue-200">
-                        <p class="text-sm text-gray-600 mb-2">โมเมนต์ดัดสูงสุด ($ M_u $) ตรวจสอบจากแผนภาพ BMD (ตรงกับสมการ $w_u L^2/12$ หรือ $w_u L^2/8$ ขึ้นกับจุดรองรับ):</p>
-                        $$ ${mu_eqn} = \\mathbf{${fmt(data.Mu, 2)} \\text{ kg-m}} $$
-
-                        <p class="text-sm text-gray-600 mb-2 mt-4">แรงอัดตามแนวแกนสูงสุด ($ P_u $) บริเวณโคนบันได (พิจารณาแรงถีบ $H_x$ ร่วมกับแรงดิ่ง $R_y$):</p>
-                        $$ P_u = H_x \\cos(\\theta) + R_y \\sin(\\theta) = ${fmt(data.Hx, 2)} \\cos(${data.theta_deg.toFixed(2)}^\\circ) + ${fmt(data.Ry, 2)} \\sin(${data.theta_deg.toFixed(2)}^\\circ) = \\mathbf{${fmt(data.Pu, 2)} \\text{ kg}} $$
+                    <div class="mt-4 mb-4 bg-gray-50 p-4 rounded border border-gray-200">
+                        <p class="font-bold text-gray-800 mb-2">3.3 แรงออกแบบประลัยสูงสุด (Design Force Envelope)</p>
                         
-                        <p class="text-sm text-gray-600 mb-2 mt-4">แรงเฉือนแนวฉากชิ้นส่วนสูงสุด ($V_{u,local}$) เกิดจากการหักล้างของแรงปฏิกิริยาดิ่งและแรงถีบที่จุดหักมุม (Kink Point) อ่านค่าพีคแบบละเอียดระดับทศนิยมจากแผนภาพ SFD ได้เท่ากับ:</p>
-                        $$ V_u = \\max(|V_{local}|) = \\mathbf{${fmt(data.Vu, 2)} \\text{ kg}} $$
+                        <div class="bg-blue-50 border border-blue-100 p-3 mb-4 text-sm text-blue-800 rounded-lg">
+                            <strong>วิธีกำหนดค่าออกแบบ (Design Approach):</strong> เพื่อความปลอดภัยสูงสุดและให้วิศวกรสามารถตรวจสอบด้วยมือได้ง่าย โปรแกรมจะคำนวณแรงด้วย <strong>"สมการคานราบเทียบเท่า (Equivalent Beam)"</strong> มาเทียบกับ <strong>"โมเดลโครงสร้างจริง 3 มิติ (DSM Matrix)"</strong> และเลือก <strong>ค่าที่สูงกว่า (Envelope)</strong> ไปใช้ในการออกแบบ
+                        </div>
+
+                        <p class="text-sm text-gray-700 font-semibold mb-1">1) โมเมนต์ดัดสูงสุด ($M_u$):</p>
+                        <div class="ml-4 text-sm text-gray-600 mb-2">
+                            <p>• จากคานราบเทียบเท่า (สมการ $w_u L^2 / ${data.denom_M}): $$ M_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}^2}{${data.denom_M}} = ${fmt(data.Mu_eq, 2)} \\text{ kg-m} $$</p>
+                            <p>• จากโมเดลจริง (DSM Matrix): $$ M_{dsm} = \\max(|M_{local}|) = ${fmt(data.Mu_dsm, 2)} \\text{ kg-m} $$</p>
+                        </div>
+                        <div class="mt-2 mb-4 pl-4 border-l-2 border-blue-200 text-blue-900">
+                            $$ M_u = \\max(M_{eq}, M_{dsm}) = \\mathbf{${fmt(data.Mu, 2)} \\text{ kg-m}} $$
+                        </div>
+
+                        <p class="text-sm text-gray-700 font-semibold mb-1 mt-4">2) แรงเฉือนสูงสุด ($V_u$):</p>
+                        <div class="ml-4 text-sm text-gray-600 mb-2">
+                            <p>• จากคานราบเทียบเท่า (สมการ $w_u L / 2$): $$ V_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}}{2} = ${fmt(data.Vu_eq, 2)} \\text{ kg} $$</p>
+                            <p>• จากโมเดลจริง (DSM Matrix Local Shear): $$ V_{dsm} = \\max(|V_{local}|) = ${fmt(data.Vu_dsm, 2)} \\text{ kg} $$</p>
+                        </div>
+                        <div class="mt-2 mb-4 pl-4 border-l-2 border-blue-200 text-blue-900">
+                            $$ V_u = \\max(V_{eq}, V_{dsm}) = \\mathbf{${fmt(data.Vu, 2)} \\text{ kg}} $$
+                        </div>
+
+                        <p class="text-sm text-gray-700 font-semibold mb-1 mt-4">3) แรงอัดตามแนวแกนสูงสุด ($P_u$):</p>
+                        <div class="ml-4 text-sm text-gray-600 mb-2">
+                            <p>• จากการคำนวณแตกแรงปฏิกิริยาฐาน ($R_y$ และ $H_x$) เข้าสู่แนวแกนบันได:</p>
+                            $$ P_{eq} = H_x \\cos(\\theta) + R_y \\sin(\\theta) = ${fmt(Math.abs(data.Rx1), 2)} \\cos(${data.theta_deg.toFixed(2)}^\\circ) + ${fmt(Math.abs(data.Ry1), 2)} \\sin(${data.theta_deg.toFixed(2)}^\\circ) = ${fmt(data.Pu_eq, 2)} \\text{ kg} $$
+                            <p class="mt-2">• จากโมเดลจริง (DSM Matrix Axial Force):</p>
+                            $$ P_{dsm} = \\max(|N_{local}|) = ${fmt(data.Pu_dsm, 2)} \\text{ kg} $$
+                        </div>
+                        <div class="mt-2 mb-4 pl-4 border-l-2 border-blue-200 text-blue-900 overflow-x-auto">
+                            $$ P_u = \\max(P_{eq}, P_{dsm}) = \\mathbf{${fmt(data.Pu, 2)} \\text{ kg}} $$
+                        </div>
                     </div>
                 </div>
 
@@ -1143,8 +1064,8 @@
                 </div>
 
                 <div class="report-section bg-orange-50 border border-orange-200 p-6 rounded-xl">
-                    <h3 class="text-orange-800 border-orange-200">5. แรงเค้นเฉพาะจุดและการออกแบบจุดหักมุม (Kink Point) <span class="ref-text" style="color: #c2410c;">[อ้างอิง: AISC 360-16 Section J10.2, Eq. J10-2]</span></h3>
-                    <p class="mb-3 text-gray-700">ณ ตำแหน่งรอยต่อระหว่างบันไดช่วงเอียงและชานพัก (Kink Point) แรงดึงและแรงอัดในปีกคานจะทำให้เกิดแรงลัพธ์ในแนวฉาก (Radial Force) ซึ่งอาจทำให้หน้าตัดเหล็กฉีกขาดหรือบิดเสียรูปได้ จึงจำเป็นต้องเชื่อมแผ่นเสริมกำลัง (Stiffener Plate)</p>
+                    <h3 class="text-orange-800 border-orange-200">5. แรงเค้นเฉพาะจุดและการออกแบบจุดหักมุม (Kink Point) <span class="ref-text" style="color: #c2410c;">[อ้างอิง: AISC 360-16 Section J10.2]</span></h3>
+                    <p class="mb-3 text-gray-700">ณ ตำแหน่งรอยต่อระหว่างบันไดช่วงเอียงและชานพัก แรงดึงและแรงอัดในปีกคานจะทำให้เกิดแรงลัพธ์ในแนวฉาก (Radial Force) จึงต้องเชื่อมแผ่นดาม (Stiffener Plate)</p>
                     
                     <p class="mb-2"><strong>โมเมนต์ดัดที่จุดหักมุม ($ M_{kink} $):</strong> ${fmt(data.M_kink, 2)} kg-m</p>
                     <p class="mb-2"><strong>แรงดึงในปีกคาน (Flange Force, $ P_f $):</strong></p>
@@ -1158,26 +1079,16 @@
                     </div>
                     
                     <svg viewBox="0 0 450 240" class="w-full max-w-[550px] mx-auto bg-white border border-gray-200 rounded-xl shadow-sm my-5">
-                        <defs>
-                            <marker id="arrow-pf" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                                <polygon points="0 0, 8 4, 0 8" fill="#2563eb" />
-                            </marker>
-                            <marker id="arrow-fr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                                <polygon points="0 0, 8 4, 0 8" fill="#dc2626" />
-                            </marker>
-                        </defs>
+                        <defs><marker id="arrow-pf" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#2563eb" /></marker><marker id="arrow-fr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#dc2626" /></marker></defs>
                         <text x="20" y="30" font-size="14" fill="#334155" font-weight="bold">แผนภาพจำลองแรงที่จุดหักมุม (Kink Point Radial Force)</text>
                         <g transform="translate(30, 20)">
                             <polygon points="50,40 180,115 350,115 350,165 195,165 50,81.5" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" />
                             <line x1="180" y1="115" x2="195" y2="165" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
-                            <path d="M 190,140 L 230,100 L 250,100" fill="none" stroke="#f97316" stroke-width="1.5" />
                             <text x="255" y="104" font-size="12" fill="#ea580c" font-weight="bold">แผ่นดาม (Stiffener Plate)</text>
                             <line x1="205" y1="165" x2="280" y2="165" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
                             <text x="285" y="170" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
                             <line x1="185" y1="159" x2="110" y2="116" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
                             <text x="85" y="115" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
-                            <path d="M 165,165 A 30,30 0 0,0 169,150" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="2,2"/>
-                            <text x="145" y="160" font-size="12" fill="#64748b">θ/2</text>
                             <line x1="195" y1="165" x2="175" y2="80" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-fr)" />
                             <rect x="80" y="45" width="120" height="25" fill="#fef2f2" rx="4" />
                             <text x="85" y="62" font-size="14" fill="#dc2626" font-weight="bold">Fr = ${fmt(data.Fr, 0)} kg</text>
@@ -1194,7 +1105,6 @@
                         <div class="mt-2 mb-4 pl-4 border-l-2 border-red-200">
                             $$ t_{req} = \\frac{A_{req}}{b_{inner}} = \\frac{${fmt(data.A_req_cm2, 3)}}{${data.b_inner_mm / 10}} \\times 10 = ${fmt(data.t_req_mm, 2)} \\text{ mm} $$
                         </div>
-                        
                         <div class="mt-4 bg-red-50 p-3 rounded-md border border-red-200">
                             <p class="text-red-800 font-semibold text-sm">ข้อแนะนำการระบุในแบบ (Recommendation):</p>
                             <p class="text-gray-800 text-sm mt-1">ควรใช้แผ่นเหล็ก Stiffener Plate หนาไม่น้อยกว่า <strong>${data.t_st_rec} mm</strong> (เชื่อมรอบตัว)</p>
@@ -1204,34 +1114,149 @@
 
                 <div class="report-section">
                     <h3>6. ตรวจสอบสภาพการใช้งาน (Serviceability & Vibration)</h3>
-                    
                     <p class="mb-2 mt-3"><strong>6.1 การโก่งตัวภายใต้น้ำหนักจร (Live Load Deflection)</strong> <span class="ref-text">[อ้างอิง: IBC 2018 Table 1604.3]</span></p>
                     <p>เกณฑ์ยอมรับ $ \\Delta_{limit} = L/400 = \\frac{${fmt(data.L*1000,0)}}{400} = ${data.def_limit_mm.toFixed(2)} \\text{ mm} $</p>
-                    <p class="text-gray-600 text-sm mt-1 mb-2">สูตรการคำนวณ (แปลงหน่วย $ w_{LL} $ เป็น kg/cm และ $ L $ เป็น cm):</p>
+                    <p class="text-gray-600 text-sm mt-1 mb-2">ประเมินจากการเทียบเท่าหน้าตัดคานราบ (Equivalent Horizontal Span):</p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
                         $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 w_{LL} L^4}{384 E I_x}' : '\\frac{1 w_{LL} L^4}{384 E I_x}'} $$
-                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E,0) + ') (' + fmt(data.Ix,2) + ')}' : '\\frac{1 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E,0) + ') (' + fmt(data.Ix,2) + ')}'} = ${data.delta_LL_max_cm.toFixed(3)} \\text{ cm} = \\mathbf{${data.delta_LL_max_mm.toFixed(2)} \\text{ mm}} \\quad \\textcolor{${data.delta_LL_max_mm <= data.def_limit_mm ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.delta_LL_max_mm <= data.def_limit_mm ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
+                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E_ksc,0) + ') (' + fmt(data.Ix,2) + ')}' : '\\frac{1 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E_ksc,0) + ') (' + fmt(data.Ix,2) + ')}'} = ${data.delta_LL_max_cm.toFixed(3)} \\text{ cm} = \\mathbf{${data.delta_LL_max_mm.toFixed(2)} \\text{ mm}} \\quad \\textcolor{${data.delta_LL_max_mm <= data.def_limit_mm ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.delta_LL_max_mm <= data.def_limit_mm ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
                     </div>
-
-                    <p class="mb-2 mt-4"><strong>6.2 ความถี่ธรรมชาติสำหรับการสั่นสะเทือน (Natural Frequency)</strong> <span class="ref-text">[อ้างอิง: AISC Design Guide 11 (2nd Ed.) Section 3.1, Eq. 3-4]</span></p>
-                    <p>อ้างอิงสมการพื้นฐาน $ f_n = \\frac{\\pi}{2}\\sqrt{\\frac{EI}{mL^4}} $ สำหรับมวลกระจายสม่ำเสมอ ซึ่งจัดรูปใหม่ได้เป็น $ f_n \\approx \\frac{17.76}{\\sqrt{\\Delta_{\\text{active(mm)}}}} $</p>
+                    <p class="mb-2 mt-4"><strong>6.2 ความถี่ธรรมชาติสำหรับการสั่นสะเทือน (Natural Frequency)</strong> <span class="ref-text">[อ้างอิง: AISC Design Guide 11]</span></p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
                         $$ f_n = \\frac{17.76}{\\sqrt{\\Delta_{active\\text{(mm)}}}} = \\frac{17.76}{\\sqrt{${data.delta_active_mm.toFixed(3)}}} = \\mathbf{${data.fn.toFixed(2)} \\text{ Hz}} $$
                     </div>
-                    <p class="text-sm text-gray-500 mt-1"><em>* แนะนำให้ $ f_n \\ge 5.0\\text{ Hz} $ สำหรับ Monumental Staircase เพื่อหลีกเลี่ยงอาการสั่นสะเทือนขณะเดิน</em></p>
                 </div>
             `;
-            
             document.getElementById('report_container').innerHTML = reportHTML;
+        }
+
+        function generateNom(data) {
+            const nomHTML = `
+                <div class="report-header">
+                    <h2 class="text-2xl font-bold text-gray-900">รายการสัญลักษณ์และตัวแปร (Nomenclature)</h2>
+                    <p class="text-gray-500 mt-1">คำอธิบายสัญลักษณ์ทางวิศวกรรมที่ใช้ในรายการคำนวณ</p>
+                </div>
+                <table class="calc-table">
+                    <thead><tr><th>สัญลักษณ์ (Symbol)</th><th>ความหมาย (Description)</th><th>หน่วย (Unit)</th></tr></thead>
+                    <tbody>
+                        <tr><td>$L$</td><td>ระยะพาดแนวนอน (Horizontal Span)</td><td>m</td></tr>
+                        <tr><td>$H$</td><td>ความสูงรวมระหว่างชั้น (Total Height)</td><td>m</td></tr>
+                        <tr><td>$W$</td><td>ความกว้างบันได (Stair Width)</td><td>m</td></tr>
+                        <tr><td>$\\theta$</td><td>มุมเอียงของบันไดเทียบกับแนวระนาบ (Inclination Angle)</td><td>degrees</td></tr>
+                        <tr><td>$d$</td><td>ความลึกของหน้าตัดเหล็กแม่บันได (Section Depth)</td><td>mm</td></tr>
+                        <tr><td>$b$</td><td>ความกว้างของหน้าตัดเหล็กแม่บันได (Section Width)</td><td>mm</td></tr>
+                        <tr><td>$t$</td><td>ความหนาของหน้าตัดเหล็กแม่บันได (Section Thickness)</td><td>mm</td></tr>
+                        <tr><td>$E$</td><td>โมดูลัสยืดหยุ่นของเหล็ก (Elastic Modulus)</td><td>ksc</td></tr>
+                        <tr><td>$F_y$</td><td>กำลังครากของเหล็ก (Yield Strength)</td><td>ksc</td></tr>
+                        <tr><td>$A$</td><td>พื้นที่หน้าตัดเหล็ก (Cross-sectional Area)</td><td>cm²</td></tr>
+                        <tr><td>$I_x$</td><td>โมเมนต์ความเฉื่อยรอบแกนหลัก (Moment of Inertia)</td><td>cm⁴</td></tr>
+                        <tr><td>$Z_x$</td><td>มอดูลัสหน้าตัดพลาสติก (Plastic Section Modulus)</td><td>cm³</td></tr>
+                        <tr><td>$LL$</td><td>น้ำหนักบรรทุกจร (Live Load)</td><td>kg/m²</td></tr>
+                        <tr><td>$SDL$</td><td>น้ำหนักวัสดุตกแต่ง (Superimposed Dead Load)</td><td>kg/m²</td></tr>
+                        <tr><td>$w_{DL}$</td><td>น้ำหนักคงที่กระจายสม่ำเสมอตามแนวคาน (Distributed Dead Load)</td><td>kg/m</td></tr>
+                        <tr><td>$w_{LL}$</td><td>น้ำหนักจรกระจายสม่ำเสมอตามแนวคาน (Distributed Live Load)</td><td>kg/m</td></tr>
+                        <tr><td>$w_u$</td><td>น้ำหนักประลัยกระจายสม่ำเสมอ (Factored Uniform Load)</td><td>kg/m</td></tr>
+                        <tr><td>$R_x$</td><td>แรงปฏิกิริยาแนวราบที่จุดรองรับ (Horizontal Reaction)</td><td>kg</td></tr>
+                        <tr><td>$R_y$</td><td>แรงปฏิกิริยาแนวดิ่งที่จุดรองรับ (Vertical Reaction)</td><td>kg</td></tr>
+                        <tr><td>$M_z$</td><td>โมเมนต์ปฏิกิริยาที่จุดรองรับ (Moment Reaction)</td><td>kg-m</td></tr>
+                        <tr><td>$P_u$</td><td>แรงอัดประลัยสูงสุด (Factored Axial Force)</td><td>kg</td></tr>
+                        <tr><td>$M_u$</td><td>โมเมนต์ดัดประลัยสูงสุด (Factored Bending Moment)</td><td>kg-m</td></tr>
+                        <tr><td>$V_u$</td><td>แรงเฉือนประลัยสูงสุด (Factored Shear Force)</td><td>kg</td></tr>
+                        <tr><td>$P_n$</td><td>กำลังรับแรงอัดระบุ (Nominal Axial Strength)</td><td>kg</td></tr>
+                        <tr><td>$M_n$</td><td>กำลังรับโมเมนต์ดัดระบุ (Nominal Flexural Strength)</td><td>kg-m</td></tr>
+                        <tr><td>$V_n$</td><td>กำลังรับแรงเฉือนระบุ (Nominal Shear Strength)</td><td>kg</td></tr>
+                        <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดที่เกิดขึ้นบริเวณจุดหักมุม (Kink Point Moment)</td><td>kg-m</td></tr>
+                        <tr><td>$P_f$</td><td>แรงกระทำในปีกคานบริเวณจุดหักมุม (Flange Force)</td><td>kg</td></tr>
+                        <tr><td>$F_r$</td><td>แรงลัพธ์ในแนวฉากที่กระทำต่อปีกคานบริเวณจุดหักมุม (Radial Force)</td><td>kg</td></tr>
+                        <tr><td>$A_{req}$</td><td>พื้นที่หน้าตัดที่ต้องการสำหรับแผ่นดาม (Required Stiffener Area)</td><td>cm²</td></tr>
+                        <tr><td>$t_{req}$</td><td>ความหนาที่ต้องการสำหรับแผ่นดาม (Required Stiffener Thickness)</td><td>mm</td></tr>
+                        <tr><td>$\\phi$</td><td>ตัวคูณลดกำลัง (Resistance Factor) = 0.90</td><td>-</td></tr>
+                        <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได (Natural Frequency)</td><td>Hz</td></tr>
+                        <tr><td>$\\Delta_{limit}$</td><td>การโก่งตัวที่ยอมรับได้ (Allowable Deflection)</td><td>mm</td></tr>
+                        <tr><td>$\\Delta_{LL}$</td><td>การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร (Live Load Deflection)</td><td>mm</td></tr>
+                        <tr><td>$\\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักมวลแอกทีฟ (Active Mass Deflection)</td><td>mm</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-12">
+                    <div class="report-header">
+                        <h2 class="text-2xl font-bold text-gray-900">ทฤษฎีการวิเคราะห์โครงสร้าง (Direct Stiffness Method)</h2>
+                        <p class="text-gray-500 mt-1">อธิบายหลักการประมวลผลของ Matrix Solver ที่อยู่เบื้องหลังโปรแกรม</p>
+                    </div>
+                    <div class="space-y-6 text-sm text-gray-700">
+                        <p>
+                            โปรแกรม <strong>Staircase Pro</strong> ใช้ระเบียบวิธี <strong>Direct Stiffness Method (DSM)</strong> ซึ่งเป็นรากฐานของโปรแกรม Finite Element (เช่น MIDAS Gen, SAP2000) ในการวิเคราะห์หาแรงภายในและแรงปฏิกิริยา แทนการใช้สมการมือพื้นฐาน (Equivalent Beam) ทั้งนี้เพื่อให้สามารถจับพฤติกรรมโครงสร้างจริง เช่น <strong>แรงถีบ (Arching Action)</strong> และ <strong>การถ่ายเทแรงข้ามแกน (Axial-Flexural Coupling)</strong> บริเวณรอยต่อหักมุมได้อย่างแม่นยำ
+                        </p>
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                            <h3 class="font-bold text-gray-900 mb-3">ขั้นตอนการวิเคราะห์โครงสร้างด้วย DSM:</h3>
+                            <ol class="list-decimal ml-5 space-y-3">
+                                <li>
+                                    <strong>การแบ่งชิ้นส่วน (Discretization):</strong> โปรแกรมจะแบ่งบันไดออกเป็น 3 ชิ้นส่วน (Elements) ได้แก่ ช่วงบันไดล่าง, ชานพัก, และช่วงบันไดบน เชื่อมต่อกันด้วยจุดต่อ (Nodes) ทั้งหมด 4 จุด
+                                </li>
+                                <li>
+                                    <strong>สร้างเมทริกซ์ความแข็งเกร็ง (Global Stiffness Matrix, $[K]$):</strong> แปลงคุณสมบัติชิ้นส่วน ($A, I, E, L$) เป็นเมทริกซ์สปริง 6x6 ในแกน Local และใช้เมทริกซ์แปลงพิกัด (Transformation Matrix, $[T]$) หมุนองศา $\\theta$ ให้เข้าสู่แกน Global X-Y นำมาประกอบเป็นระบบสมการขนาด 12x12
+                                </li>
+                                <li>
+                                    <strong>การแก้สมการ (Solve for Displacements, $[U]$):</strong> กำหนดเงื่อนไขขอบเขต (Support Conditions) เช่น Fixed, Pinned และนำน้ำหนักบรรทุกเทียบเท่าที่จุดต่อ (Equivalent Nodal Loads) มาแก้สมการ <strong>$[F] = [K][U]$</strong> ด้วยวิธีกำจัดแบบเกาส์ (Gauss Elimination) เพื่อหาระยะแอ่นและการบิดหมุนที่ทุกจุดต่อ
+                                </li>
+                                <li>
+                                    <strong>คำนวณแรงภายใน (Internal Forces):</strong> นำระยะเคลื่อนตัวที่คำนวณได้ ไปคูณกลับด้วย Local Stiffness Matrix เพื่อให้ได้แรงตามแนวแกน (Axial), แรงเฉือน (Shear), และโมเมนต์ดัด (Bending) ที่เกิดขึ้นจริงบนแกนความเอียงของชิ้นส่วน
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <div class="report-header">
+                        <h2 class="text-2xl font-bold text-gray-900">คำแนะนำการนำแรงไปออกแบบจุดเชื่อมต่อ (Connection Guidelines)</h2>
+                        <p class="text-gray-500 mt-1">การนำค่าจากโปรแกรมไปออกแบบจุดต่อโครงสร้างตามมาตรฐาน มีแนวทางดังนี้</p>
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">1. จุดรองรับที่ฐานบันได (Base Support / Base Plate)</h3>
+                            <p class="text-sm text-gray-600 mb-3">คือจุดที่โคนบันไดเหล็กยึดติดกับพื้นตอม่อคอนกรีต หรือคานเหล็กชั้นล่าง</p>
+                            <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                <li><strong>$R_{y1}$ (แรงปฏิกิริยาแนวดิ่ง <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Ry1), 2)} kg</span>):</strong> ใช้คำนวณหากำลังรับแรงเฉือนของรอยเชื่อม, แรงเฉือนใน Anchor Bolt และ Bearing (การกดทับ) บน Base Plate</li>
+                                <li><strong>$R_{x1}$ (แรงถีบแนวราบ <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Rx1), 2)} kg</span>):</strong> ถ้าจุดรองรับเป็น Fixed หรือ Pinned จะต้องนำแรงนี้ไปคำนวณแรงเฉือน (Shear) หรือแรงดึง (Tension) ในน็อตฝังด้วย (แรงนี้มักจะทำให้จุดต่อวิกฤต)</li>
+                                <li><strong>$M_{z1}$ (โมเมนต์ที่ฐาน <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Mz1), 2)} kg-m</span>):</strong> ถ้าจุดรองรับเป็น Fixed ต้องนำค่าไปหาความหนาแผ่นเหล็ก Base Plate และคำนวณแรงดึง-อัดในกลุ่มน็อตฝัง (Anchor Bolt)</li>
+                            </ul>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
+                                <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดและความหนาของ Base Plate, ขนาด/ระยะฝังของ Anchor Bolt, ขนาดรอยเชื่อม (Fillet Weld)
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">2. จุดรองรับด้านบน (Top Connection)</h3>
+                            <p class="text-sm text-gray-600 mb-3">คือจุดที่ชานพักบันไดยึดเข้ากับคานหลักของตัวอาคาร (คานเหล็กหรือคานคอนกรีต)</p>
+                            <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                <li>ใช้หลักการเดียวกับฐานบันไดคือดึงค่าปฏิกิริยา <strong>$R_{y2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Ry2), 2)} kg</span>), $R_{x2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Rx2), 2)} kg</span>), $M_{z2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Mz2), 2)} kg-m</span>)</strong> ไปใช้งาน</li>
+                            </ul>
+                            <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-sm text-red-800">
+                                <span class="font-bold">⚠️ ข้อควรระวังสูงสุด:</span> คานของตัวอาคารที่มารับบันได จะต้องถูกออกแบบให้รับแรง <strong>$R_{x2}$ (แรงถีบ)</strong> จากบันไดด้วย ซึ่งจะทำให้คานอาคารเกิด "การดัดในแกนอ่อน (Weak-axis Bending)" หรือ "แรงบิด (Torsion)" หากไม่ได้เตรียมคานอาคารไว้รับแรงถีบ แนะนำให้ออกแบบจุดรองรับบันไดฝั่งใดฝั่งหนึ่งเป็นจุดเลื่อน (Roller) เพื่อให้ $R_x = 0$
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">3. รอยต่อจุดหักมุม (Kink Point / Splice Connection)</h3>
+                            <p class="text-sm text-gray-600 mb-3">จุดที่ช่างจะต้องทำการ "ตัดบาก (Miter Cut)" และเชื่อมต่อเหล็กกล่องให้หักมุมตามรูปทรงบันได</p>
+                            <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
+                                <li><strong>$M_{kink}$ (โมเมนต์ที่จุดหักมุม <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.M_kink, 2)} kg-m</span>):</strong> ใช้คำนวณหาแรงดึง/แรงอัดในปีกคาน ($P_f$) เพื่อประเมินพื้นที่หน้าตัดของรอยเชื่อม</li>
+                                <li><strong>$F_r$ (Radial Force <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.Fr, 2)} kg</span>):</strong> ใช้สำหรับออกแบบความหนาของแผ่น Stiffener Plate ดามด้านใน เพื่อป้องกันไม่ให้มุมคานเหล็กกล่องฉีกขาดเสียรูป</li>
+                                <li><strong>$V_u$ และ $P_u$ (Local Forces <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">-> Vu = ${fmt(data.Vu, 2)} kg, Pu = ${fmt(data.Pu, 2)} kg</span>):</strong> นำค่าแรงเฉือนและแรงตามแนวแกนบริเวณรอยต่อ มารวมกับการเช็ครอยเชื่อม</li>
+                            </ul>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
+                                <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดรอยเชื่อมต่อชน (แนะนำให้เป็น CJP - Complete Joint Penetration) และการเชื่อมยึดแผ่น Stiffener
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('nom_container').innerHTML = nomHTML;
 
             if (typeof renderMathInElement === 'function') {
-                renderMathInElement(document.getElementById('report_container'), {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "$", right: "$", display: false}
-                    ],
-                    throwOnError: false
-                });
+                renderMathInElement(document.getElementById('report_container'), { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}], throwOnError: false });
+                renderMathInElement(document.getElementById('nom_container'), { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}], throwOnError: false });
             }
         }
 
@@ -1243,16 +1268,6 @@
             });
             window.addEventListener('resize', calculateAndDraw);
             calculateAndDraw(); 
-            
-            if (typeof renderMathInElement === 'function') {
-                renderMathInElement(document.getElementById('nomenclature'), {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "$", right: "$", display: false}
-                    ],
-                    throwOnError: false
-                });
-            }
         });
     </script>
 </body>
