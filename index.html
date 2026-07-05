@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staircase Pro: โปรแกรมออกแบบบันไดเหล็ก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f4f6; }
+        
+        /* Tab System Logic */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        
+        .report-page { background: white; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); max-width: 900px; margin: 0 auto; }
+        .report-header { border-bottom: 2px solid #1e40af; padding-bottom: 10px; margin-bottom: 20px; }
+        .report-section { margin-bottom: 30px; }
+        .report-section h3 { color: #1e3a8a; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px; font-size: 1.1rem; }
+        .ref-text { font-size: 0.8rem; color: #64748b; font-weight: normal; margin-left: 8px; display: inline-block; font-style: italic; }
+        
+        table.calc-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95rem; }
+        table.calc-table th, table.calc-table td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+        table.calc-table th { background-color: #f8fafc; font-weight: 600; width: 40%; }
+        
+        .katex-display { margin: 10px 0; overflow-x: auto; overflow-y: hidden; }
+
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .print-full-width { width: 100% !important; padding: 0 !important; margin: 0 !important; display: block !important; }
+            .report-page { box-shadow: none; padding: 0; max-width: 100%; }
+            #dashboard, #diagrams, #nomenclature { display: none !important; }
+            #report { display: block !important; }
+            @page { margin: 1.5cm; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-screen flex overflow-hidden">
+    <!-- Sidebar Inputs -->
+    <div class="w-80 bg-white border-r border-gray-200 flex flex-col h-full no-print z-10 shadow-lg shrink-0">
+        <div class="p-5 bg-blue-900 text-white">
+            <h1 class="text-xl font-bold tracking-wide">StaircasePro</h1>
+            <p class="text-blue-200 text-sm opacity-80">รายการคำนวณบันไดเหล็ก (AISC 360-16)</p>
+        </div>
+        
+        <div class="p-5 overflow-y-auto sidebar-scroll flex-1 text-sm">
+            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">พารามิเตอร์การออกแบบ</h2>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-gray-600 mb-1">ระยะพาดแนวนอนรวม, L (m)</label>
+                    <input type="number" id="span_L" value="10" step="0.1" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-600 mb-1">ความสูงรวมระหว่างชั้น, H (m)</label>
+                    <input type="number" id="height_H" value="4.5" step="0.1" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-600 mb-1">ความกว้างบันได, W (m)</label>
+                    <input type="number" id="width_W" value="2" step="0.1" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-600 mb-1">ความยาวชานพักตรงกลาง (m)</label>
+                    <input type="number" id="landing_L" value="2.0" step="0.1" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">จุดรองรับ (SUPPORT CONDITION)</h2>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <select id="support_type" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium text-xs">
+                        <option value="pinned-roller">จุดหมุน-เลื่อน (Pinned-Roller) - ไม่มีแรงถีบ Hx</option>
+                        <option value="fixed-roller">ยึดแน่น-เลื่อน (Fixed-Roller) - มีโมเมนต์และไม่มีแรงถีบ Hx</option>
+                        <option value="pinned">จุดหมุนยึดแน่น (Pinned-Pinned) - เกิดแรงถีบ Hx</option>
+                        <option value="fixed" selected>ยึดแน่น (Fixed-Fixed) - มีโมเมนต์และแรงถีบ Hx</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">น้ำหนักบรรทุก</h2>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-gray-600 mb-1">น้ำหนักจร, LL (kg/m²)</label>
+                    <input type="number" id="load_LL" value="300" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-600 mb-1">น้ำหนักวัสดุตกแต่ง, SDL (kg/m²)</label>
+                    <input type="number" id="load_SDL" value="0" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">หน้าตัดเหล็กแม่บันได (RHS/BOX)</h2>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-gray-600 mb-1">เกรดเหล็ก</label>
+                    <select id="steel_grade" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                        <option value="2450">SS400 / A36 (Fy = 2,450 ksc)</option>
+                        <option value="3450">SM490 / Gr.50 (Fy = 3,450 ksc)</option>
+                    </select>
+                </div>
+                <div class="flex space-x-2">
+                    <div class="w-1/3">
+                        <label class="block text-gray-600 mb-1 text-xs">ลึก, d (mm)</label>
+                        <input type="number" id="sec_d" value="400" class="w-full border rounded px-2 py-1.5">
+                    </div>
+                    <div class="w-1/3">
+                        <label class="block text-gray-600 mb-1 text-xs">กว้าง, b (mm)</label>
+                        <input type="number" id="sec_b" value="200" class="w-full border rounded px-2 py-1.5">
+                    </div>
+                    <div class="w-1/3">
+                        <label class="block text-gray-600 mb-1 text-xs">หนา, t (mm)</label>
+                        <input type="number" id="sec_t" value="12" class="w-full border rounded px-2 py-1.5">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full bg-gray-50 print-full-width min-w-0">
+        
+        <!-- Top Navigation -->
+        <div class="bg-white border-b px-6 py-3 flex justify-between items-center no-print shrink-0 overflow-x-auto">
+            <div class="flex space-x-1 border rounded-lg bg-gray-100 p-1 shrink-0">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">แดชบอร์ด</button>
+                <button onclick="switchTab('diagrams')" id="tab-diagrams" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">ไดอะแกรมแรง (FBD/SFD/BMD)</button>
+                <button onclick="switchTab('report')" id="tab-report" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">รายการคำนวณ</button>
+                <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">ตัวแปร/สัญลักษณ์</button>
+            </div>
+            <button onclick="printReport()" class="flex items-center px-4 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 shadow-sm transition-colors shrink-0 ml-4">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                พิมพ์รายงาน (PDF)
+            </button>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto p-6 text-gray-800 relative w-full block">
+            
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0 mb-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium" title="ตรวจสอบพฤติกรรมแรงอัดร่วมกับแรงดัด (Interaction)">อัตราส่วนหน่วยแรง (D/C RATIO)</p>
+                            <div class="flex items-baseline mt-1">
+                                <span id="out_ratio" class="text-3xl font-bold text-gray-900">0.00</span>
+                            </div>
+                        </div>
+                        <div id="badge_ratio" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">PASS</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">การโก่งตัวสูงสุด (LIVE LOAD)</p>
+                            <div class="flex items-baseline mt-1">
+                                <span id="out_def" class="text-3xl font-bold text-gray-900">0.0</span>
+                                <span class="text-gray-500 ml-1 font-medium">mm</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1" id="out_def_limit">เกณฑ์ยอมรับ: 0.0 mm (L/400)</p>
+                        </div>
+                        <div id="badge_def" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">PASS</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">ความถี่ธรรมชาติ (VIBRATION)</p>
+                            <div class="flex items-baseline mt-1">
+                                <span id="out_vib" class="text-3xl font-bold text-gray-900">0.0</span>
+                                <span class="text-gray-500 ml-1 font-medium">Hz</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1" id="out_vib_status">ความแข็งเกร็งสูง</p>
+                        </div>
+                        <div id="badge_vib" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">> 5Hz</div>
+                    </div>
+                </div>
+                
+                <!-- Canvases Layout (Vertical Stack for better sizing) -->
+                <div class="space-y-6 pb-10 block w-full">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 relative h-[300px] w-full flex flex-col">
+                        <h3 class="text-sm font-bold text-gray-600 mb-2 absolute top-4 left-4 z-10">รูปด้าน (Elevation / Section)</h3>
+                        <div class="flex-1 w-full relative pt-8 h-full">
+                            <canvas id="canvasElevation" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 relative h-[250px] w-full flex flex-col">
+                        <h3 class="text-sm font-bold text-gray-600 mb-2 absolute top-4 left-4 z-10">แปลนทั่วไป (General Plan)</h3>
+                        <div class="flex-1 w-full relative pt-8 h-full">
+                            <canvas id="canvasPlan" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white border-2 border-red-100 rounded-xl shadow-sm p-4 relative h-[250px] w-full flex flex-col">
+                        <h3 class="text-sm font-bold text-red-600 mb-2 absolute top-4 left-4 z-10">แปลนแสดงตำแหน่งแผ่นดาม (Stiffener Layout Plan)</h3>
+                        <div class="flex-1 w-full relative pt-8 h-full">
+                            <canvas id="canvasStiffenerPlan" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagrams Tab -->
+            <div id="diagrams" class="tab-content">
+                <div class="block space-y-6 pb-10 w-full">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col relative h-[350px]">
+                        <h3 class="text-sm font-bold text-gray-600 mb-1 z-10">Free Body Diagram (FBD)</h3>
+                        <p class="text-xs text-gray-400 mb-2 z-10">วิเคราะห์โครงเฟรมตามความเอียงจริง (Kinked Beam Equivalent Frame)</p>
+                        <div class="flex-1 w-full h-full relative">
+                            <canvas id="canvasFBD" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col relative h-[350px]">
+                        <h3 class="text-sm font-bold text-gray-600 mb-1 z-10">Axial Force Diagram (AFD)</h3>
+                        <p class="text-xs text-gray-400 mb-2 z-10">พล็อตทาบตามแกนโครงสร้างจริง (แรงอัด = ค่าลบ สีฟ้า, แรงดึง = ค่าบวก สีส้ม)</p>
+                        <div class="flex-1 w-full h-full relative">
+                            <canvas id="canvasAFD" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col relative h-[350px]">
+                        <h3 class="text-sm font-bold text-gray-600 mb-1 z-10">Shear Force Diagram (SFD)</h3>
+                        <p class="text-xs text-gray-400 mb-2 z-10">พล็อตตั้งฉากชิ้นส่วนโครงสร้างจริง (Local Shear)</p>
+                        <div class="flex-1 w-full h-full relative">
+                            <canvas id="canvasSFD" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col relative h-[350px]">
+                        <h3 class="text-sm font-bold text-gray-600 mb-1 z-10">Bending Moment Diagram (BMD)</h3>
+                        <p class="text-xs text-gray-400 mb-2 z-10">พล็อตทิศทาง Tension-side ตามมุมชิ้นส่วน (ทิศเดียวกับ MIDAS/SAP2000)</p>
+                        <div class="flex-1 w-full h-full relative">
+                            <canvas id="canvasBMD" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Tab -->
+            <div id="report" class="tab-content">
+                <div class="report-page" id="report_container">
+                    <!-- JS will populate report here -->
+                </div>
+            </div>
+
+            <!-- Nomenclature Tab -->
+            <div id="nomenclature" class="tab-content">
+                <div class="report-page">
+                    <div class="report-header">
+                        <h2 class="text-2xl font-bold text-gray-900">รายการสัญลักษณ์และตัวแปร (Nomenclature)</h2>
+                        <p class="text-gray-500 mt-1">คำอธิบายสัญลักษณ์ทางวิศวกรรมที่ใช้ในรายการคำนวณ</p>
+                    </div>
+                    <table class="calc-table">
+                        <thead><tr><th>สัญลักษณ์ (Symbol)</th><th>ความหมาย (Description)</th><th>หน่วย (Unit)</th></tr></thead>
+                        <tbody>
+                            <tr><td>$L, H, W$</td><td>ระยะพาดแนวนอน, ความสูงรวม, และความกว้างบันได</td><td>m</td></tr>
+                            <tr><td>$L_{landing}$</td><td>ความยาวชานพักตรงกลาง</td><td>m</td></tr>
+                            <tr><td>$\theta$</td><td>มุมเอียงของบันไดเทียบกับแนวระนาบ</td><td>degrees</td></tr>
+                            <tr><td>$d, b, t$</td><td>ความลึก, ความกว้าง, และความหนาของหน้าตัดเหล็กแม่บันได</td><td>mm</td></tr>
+                            <tr><td>$d_{in}, b_{in}$</td><td>ความลึกด้านใน, ความกว้างด้านในของหน้าตัดเหล็ก</td><td>mm</td></tr>
+                            <tr><td>$F_y, E$</td><td>กำลังรับแรงดึงคราก (Yield Strength) และ โมดูลัสยืดหยุ่น (Elastic Modulus)</td><td>kg/cm²</td></tr>
+                            <tr><td>$A, I_x, Z_x$</td><td>พื้นที่หน้าตัด, โมเมนต์ความเฉื่อย, มอดูลัสหน้าตัดพลาสติก</td><td>cm², cm⁴, cm³</td></tr>
+                            <tr><td>$A_w$</td><td>พื้นที่รับแรงเฉือนของหน้าตัด (Web Shear Area)</td><td>cm²</td></tr>
+                            <tr><td>$LL, SDL$</td><td>น้ำหนักบรรทุกจร และ น้ำหนักวัสดุตกแต่ง</td><td>kg/m²</td></tr>
+                            <tr><td>$W_{trib}$</td><td>ระยะกว้างรับน้ำหนักของแม่บันได 1 ข้าง (Tributary Width)</td><td>m</td></tr>
+                            <tr><td>$w_{DL}, w_{LL}$</td><td>น้ำหนักบรรทุกคงที่ และ น้ำหนักบรรทุกจรแบบแผ่กระจายบนแม่บันได</td><td>kg/m</td></tr>
+                            <tr><td>$w_u$</td><td>น้ำหนักบรรทุกประลัยกระจายสม่ำเสมอ (Factored Load)</td><td>kg/m</td></tr>
+                            <tr><td>$R_y, H_x, M_z$</td><td>แรงปฏิกิริยาแนวดิ่ง, แรงถีบแนวราบ, และโมเมนต์ดัดที่จุดรองรับ</td><td>kg, kg-m</td></tr>
+                            <tr><td>$P_u, M_u, V_u$</td><td>แรงอัดประลัย, โมเมนต์ดัดประลัย, แรงเฉือนประลัยสูงสุดที่เกิดขึ้น</td><td>kg, kg-m</td></tr>
+                            <tr><td>$\phi_c, \phi_b, \phi_v$</td><td>ตัวคูณลดกำลัง (Resistance Factor) สำหรับแรงอัด, แรงดัด, และแรงเฉือน</td><td>-</td></tr>
+                            <tr><td>$P_n, M_n, V_n$</td><td>กำลังรับแรงอัดระบุ, โมเมนต์ดัดระบุ, แรงเฉือนระบุของหน้าตัด</td><td>kg, kg-m</td></tr>
+                            <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดบริเวณจุดหักมุม (Kink Point Moment)</td><td>kg-m</td></tr>
+                            <tr><td>$P_f$</td><td>แรงตามแนวแกนในปีกคานบริเวณจุดหักมุม (Flange Force)</td><td>kg</td></tr>
+                            <tr><td>$F_r$</td><td>แรงลัพธ์ในแนวฉากที่กระทำต่อปีกคานบริเวณจุดหักมุม (Radial Force)</td><td>kg</td></tr>
+                            <tr><td>$A_{req}, t_{req}$</td><td>พื้นที่หน้าตัด และความหนาที่ต้องการของแผ่นดาม (Stiffener Plate)</td><td>cm², mm</td></tr>
+                            <tr><td>$\Delta_{limit}, \Delta_{LL}$</td><td>เกณฑ์การโก่งตัวที่ยอมรับได้ และ การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร</td><td>mm</td></tr>
+                            <tr><td>$\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักกึ่งถาวร (DL + 10% LL) สำหรับประเมินการสั่นสะเทือน</td><td>mm</td></tr>
+                            <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได (Natural Frequency)</td><td>Hz</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function printReport() {
+            switchTab('report');
+            setTimeout(() => { 
+                window.print(); 
+            }, 800); 
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('button[id^="tab-"]').forEach(el => {
+                el.classList.remove('bg-white', 'shadow-sm', 'text-blue-700');
+                el.classList.add('text-gray-500');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.remove('text-gray-500');
+            activeBtn.classList.add('bg-white', 'shadow-sm', 'text-blue-700');
+
+            if(tabId === 'dashboard' || tabId === 'diagrams' || tabId === 'report') {
+                setTimeout(calculateAndDraw, 50); 
+            }
+        }
+
+        const fmt = (num, dec=2) => Number(num).toLocaleString('en-US', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+
+        function calculateAndDraw() {
+            try {
+                // Get inputs
+                const L = parseFloat(document.getElementById('span_L').value) || 0;
+                const H = parseFloat(document.getElementById('height_H').value) || 0;
+                const W = parseFloat(document.getElementById('width_W').value) || 0;
+                const L_landing = parseFloat(document.getElementById('landing_L').value) || 0;
+                const LL = parseFloat(document.getElementById('load_LL').value) || 0;
+                const SDL = parseFloat(document.getElementById('load_SDL').value) || 0;
+                const Fy = parseFloat(document.getElementById('steel_grade').value) || 2450;
+                const E = 2040000; 
+                const d = parseFloat(document.getElementById('sec_d').value) || 0; 
+                const b = parseFloat(document.getElementById('sec_b').value) || 0; 
+                let t = parseFloat(document.getElementById('sec_t').value) || 0; 
+                const support_type = document.getElementById('support_type').value;
+
+                if (L <= 0 || H <= 0 || W <= 0 || d <= 0 || b <= 0 || t <= 0) return;
+                if (t * 2 >= d || t * 2 >= b) t = Math.min(d, b) / 2.1; 
+
+                // Geometry
+                const L_flight = Math.max(0.1, (L - L_landing) / 2); 
+                const H_flight = H / 2; 
+                const theta_rad = Math.atan2(H_flight, L_flight);
+                const theta_deg = theta_rad * 180 / Math.PI;
+
+                let numRisers = Math.round(H_flight / 0.175); 
+                if(numRisers < 1) numRisers = 1;
+                const riser = (H_flight / numRisers) * 1000; 
+                const tread = (L_flight / numRisers) * 1000; 
+                const ergRule = (2 * riser + tread); 
+
+                // Section Properties
+                const dc = d / 10; const bc = b / 10; const tc = t / 10; 
+                const d_inner = dc - 2*tc;
+                const b_inner = bc - 2*tc;
+                const Area = (dc*bc) - (d_inner*b_inner); 
+                const w_steel = Area * 7850 / 10000; 
+                const Ix = (bc * Math.pow(dc, 3) / 12) - (b_inner * Math.pow(d_inner, 3) / 12); 
+                const Zx = (bc * Math.pow(dc, 2) / 4) - (b_inner * Math.pow(d_inner, 2) / 4); 
+
+                // Loads (Per Stringer)
+                const w_trib = W / 2;
+                const DL_steel = w_steel * 1.1; 
+                const DL_stair = (SDL * w_trib); 
+                const DL_total = DL_steel + DL_stair; 
+                const LL_stringer = LL * w_trib; 
+                
+                const w_u = (1.2 * DL_total) + (1.6 * LL_stringer); 
+
+                // Statics Update (Including Roller & Fixed Support logic)
+                const Ry = w_u * L / 2;
+                let Hx = 0; 
+                let Mz = 0;
+                let delta_LL_max_cm;
+                
+                const w_LL_cm = LL_stringer / 100; // แปลงหน่วย kg/m -> kg/cm
+                const L_cm = L * 100; // m -> cm
+
+                if(support_type === 'pinned-roller') {
+                    Hx = 0; Mz = 0;
+                    delta_LL_max_cm = (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
+                } else if(support_type === 'fixed-roller') {
+                    Hx = 0; 
+                    Mz = (w_u * Math.pow(L, 2)) / 12; 
+                    delta_LL_max_cm = (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
+                } else if(support_type === 'pinned') {
+                    Hx = (Ry * L) / (2 * H); Mz = 0;
+                    delta_LL_max_cm = (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
+                } else { // fixed
+                    Hx = (Ry * L) / H; 
+                    Mz = (w_u * Math.pow(L, 2)) / 12; 
+                    delta_LL_max_cm = (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E * Ix); 
+                }
+                const delta_LL_max_mm = delta_LL_max_cm * 10; 
+
+                // === สร้าง ARRAY วิเคราะห์โครงสร้างจริงระดับละเอียดเพื่อหา Peak 100% ===
+                let forceData = [];
+                let maxA = -Infinity, minA = Infinity, maxS = -Infinity, minS = Infinity, maxB = -Infinity, minB = Infinity;
+                
+                // สับความละเอียด 250 จุด และจงใจแทรกจุดหักมุม (Kink Points) เข้าไปใน Array โดยตรง
+                let x_points = [];
+                const steps = 250; 
+                for(let i=0; i<=steps; i++) x_points.push(i * L / steps);
+                x_points.push(L_flight - 0.0001);
+                x_points.push(L_flight + 0.0001);
+                x_points.push(L_flight + L_landing - 0.0001);
+                x_points.push(L_flight + L_landing + 0.0001);
+                x_points.sort((a,b) => a-b); 
+
+                x_points.forEach(x => {
+                    if(x > L) x = L; 
+                    
+                    const V_global = Ry - w_u * x; 
+                    let M = (Ry * x) - (w_u * Math.pow(x, 2)) / 2;
+                    if(support_type === 'fixed' || support_type === 'fixed-roller') M -= Mz; 
+
+                    let N_local, V_local;
+                    if (x < L_flight) { 
+                        N_local = - (Hx * Math.cos(theta_rad) + V_global * Math.sin(theta_rad));
+                        V_local = V_global * Math.cos(theta_rad) - Hx * Math.sin(theta_rad);
+                    } else if (x > L_flight + L_landing) {
+                        N_local = - (Hx * Math.cos(theta_rad) - V_global * Math.sin(theta_rad));
+                        V_local = V_global * Math.cos(theta_rad) + Hx * Math.sin(theta_rad);
+                    } else { 
+                        N_local = -Hx; 
+                        V_local = V_global;
+                    }
+
+                    forceData.push({ x: x, AFD: N_local, SFD: V_local, BMD: M });
+                    maxA = Math.max(maxA, N_local); minA = Math.min(minA, N_local);
+                    maxS = Math.max(maxS, V_local); minS = Math.min(minS, V_local);
+                    maxB = Math.max(maxB, M); minB = Math.min(minB, M);
+                });
+
+                // ดึงค่าแรงขีดสุดสัมบูรณ์ (Absolute Max) จาก Local Diagram โดยตรง
+                const Pu = Math.max(Math.abs(maxA), Math.abs(minA));
+                const Vu = Math.max(Math.abs(maxS), Math.abs(minS));
+                const Mu = Math.max(Math.abs(maxB), Math.abs(minB));
+
+                // Strength Check
+                const phi_b = 0.90; const phi_c = 0.90; const phi_v = 0.90;
+
+                const Pn = Fy * Area; 
+                const phi_Pn = phi_c * Pn; 
+                const ratio_axial = Pu / phi_Pn;
+
+                const Mn = Fy * Zx / 100; 
+                const phi_Mn = phi_b * Mn;
+                const ratio_flexure = Mu / phi_Mn;
+
+                let ratio_interaction = 0;
+                if (ratio_axial >= 0.2) {
+                    ratio_interaction = ratio_axial + (8.0/9.0) * ratio_flexure;
+                } else {
+                    ratio_interaction = (ratio_axial / 2.0) + ratio_flexure;
+                }
+
+                const Aw = 2 * dc * tc;
+                const Vn = 0.6 * Fy * Aw * 1.0;
+                const phi_Vn = phi_v * Vn;
+                const ratio_shear = Vu / phi_Vn;
+
+                const max_ratio = Math.max(ratio_interaction, ratio_shear);
+
+                // Kink Point Stresses
+                let M_kink = (Ry * L_flight) - (w_u * Math.pow(L_flight, 2) / 2);
+                if(support_type === 'fixed' || support_type === 'fixed-roller') M_kink -= Mz;
+                M_kink = Math.abs(M_kink); 
+                
+                const d_eff = (d - t) / 1000; 
+                const Pf = M_kink / d_eff; 
+                const Fr = 2 * Pf * Math.sin(theta_rad / 2); 
+
+                const b_inner_mm = b - 2 * t; 
+                const A_req_cm2 = Fr / (0.90 * Fy); 
+                const t_req_mm = (A_req_cm2 / (b_inner_mm / 10)) * 10; 
+                const t_st_rec = Math.ceil(Math.max(t_req_mm, t, 6)); 
+
+                // Vibration Check (Dunkerley)
+                let w_active = DL_total + (0.1 * LL_stringer);
+                let w_active_cm = w_active / 100; 
+                let delta_active_cm = (support_type === 'pinned' || support_type === 'pinned-roller') 
+                    ? (5 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E * Ix)
+                    : (1 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E * Ix);
+                let delta_active_mm = delta_active_cm * 10;
+                    
+                const fn = 17.76 / Math.sqrt(Math.max(delta_active_mm, 0.001));
+                const def_limit_mm = (L * 1000) / 400; 
+
+                // UPDATE UI Dashboards
+                document.getElementById('out_ratio').innerText = max_ratio.toFixed(2);
+                const b_ratio = document.getElementById('badge_ratio');
+                if(max_ratio <= 1.0) {
+                    b_ratio.innerText = 'PASS'; b_ratio.className = 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700';
+                } else {
+                    b_ratio.innerText = 'FAIL'; b_ratio.className = 'px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700';
+                }
+
+                document.getElementById('out_def').innerText = delta_LL_max_mm.toFixed(2);
+                document.getElementById('out_def_limit').innerText = `เกณฑ์ยอมรับ: ${def_limit_mm.toFixed(2)} mm (L/400)`;
+                const b_def = document.getElementById('badge_def');
+                if(delta_LL_max_mm <= def_limit_mm) {
+                    b_def.innerText = 'PASS'; b_def.className = 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700';
+                } else {
+                    b_def.innerText = 'FAIL'; b_def.className = 'px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700';
+                }
+
+                document.getElementById('out_vib').innerText = fn.toFixed(2);
+                const b_vib = document.getElementById('badge_vib');
+                const t_vib = document.getElementById('out_vib_status');
+                if(fn >= 8) {
+                    b_vib.innerText = 'Very Stiff'; b_vib.className = 'px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700';
+                    t_vib.innerText = 'ความแข็งเกร็งสูงมาก';
+                } else if (fn >= 5) {
+                    b_vib.innerText = '> 5Hz'; b_vib.className = 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700';
+                    t_vib.innerText = 'ผ่านเกณฑ์ความสบาย (Comfort Limit)';
+                } else {
+                    b_vib.innerText = '< 5Hz'; b_vib.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700';
+                    t_vib.innerText = 'อาจเกิดการสั่นสะเทือนขณะเดิน';
+                }
+
+                const calcData = {
+                    L, H, W, L_landing, L_flight, H_flight, riser, tread, ergRule, theta_rad, theta_deg,
+                    LL, SDL, Fy, E, d, b, t, Area, w_steel, Ix, Zx,
+                    w_trib, DL_steel, DL_stair, DL_total, LL_stringer, w_u, w_LL_cm, L_cm,
+                    Mu, Vu, Pu, Ry, Hx, Mz, support_type,
+                    phi_Pn, ratio_axial,
+                    Mn, phi_Mn, ratio_flexure, ratio_interaction,
+                    Vn, phi_Vn, ratio_shear, max_ratio,
+                    M_kink, d_eff, Pf, Fr, b_inner_mm, A_req_cm2, t_req_mm, t_st_rec,
+                    delta_LL_max_cm, delta_LL_max_mm, def_limit_mm, fn, w_active_cm, delta_active_mm, delta_active_cm,
+                    forceData, maxA, minA, maxS, minS, maxB, minB
+                };
+
+                drawElevation(calcData);
+                drawPlan(calcData);
+                drawStiffenerPlan(calcData);
+                drawFBD(calcData);
+                drawTrueDiagrams(calcData); 
+                generateReport(calcData);
+
+            } catch (e) {
+                console.error("Calculation Error:", e);
+            }
+        }
+
+        function drawElevation(data) {
+            const canvas = document.getElementById('canvasElevation');
+            const ctx = canvas.getContext('2d');
+            const cw = canvas.parentElement.clientWidth;
+            const ch = canvas.parentElement.clientHeight;
+            if (cw === 0 || ch === 0) return; 
+            
+            canvas.width = cw; canvas.height = ch;
+            ctx.clearRect(0, 0, cw, ch);
+            
+            const margin = 50;
+            const drawW = cw - 2*margin;
+            const drawH = ch - 2*margin;
+            const scaleX = drawW / data.L;
+            const scaleY = drawH / data.H;
+            const scale = Math.min(scaleX, scaleY) * 0.8;
+            const cx = cw/2; const cy = ch/2;
+            
+            const mapPt = (x, y) => ({
+                x: cx + (x - data.L/2) * scale,
+                y: cy - (y - data.H/2) * scale
+            });
+
+            const p0 = mapPt(0, 0); 
+            const p1 = mapPt(data.L_flight, data.H_flight); 
+            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); 
+            const p3 = mapPt(data.L, data.H); 
+
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+            ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 6; ctx.lineJoin = 'bevel'; ctx.stroke();
+
+            ctx.fillStyle = '#ef4444';
+            [p1, p2].forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
+            });
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(p0.x - 10, p0.y, 20, 20); ctx.fillRect(p3.x, p3.y, 20, 20); 
+            if(data.support_type === 'pinned-roller' || data.support_type === 'fixed-roller') {
+                ctx.beginPath(); ctx.arc(p0.x, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p0.x - 10, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p0.x + 10, p0.y + 25, 5, 0, Math.PI*2); ctx.fill();
+            }
+
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.fillStyle = '#475569'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+            const dimY = Math.max(p0.y, p3.y) + 40;
+            ctx.beginPath(); ctx.moveTo(p0.x, p0.y + 10); ctx.lineTo(p0.x, dimY + 5); ctx.moveTo(p3.x, p3.y + 10); ctx.lineTo(p3.x, dimY + 5); ctx.moveTo(p0.x, dimY); ctx.lineTo(p3.x, dimY); ctx.stroke();
+            ctx.fillText(`L = ${data.L} m`, cx, dimY - 5);
+            
+            const dimX = Math.min(p0.x, p3.x) - 40;
+            ctx.beginPath(); ctx.moveTo(p0.x - 10, p0.y); ctx.lineTo(dimX - 5, p0.y); ctx.moveTo(p3.x - 10, p3.y); ctx.lineTo(dimX - 5, p3.y); ctx.moveTo(dimX, p0.y); ctx.lineTo(dimX, p3.y); ctx.stroke();
+            ctx.save(); ctx.translate(dimX - 5, cy); ctx.rotate(-Math.PI/2); ctx.fillText(`H = ${data.H} m`, 0, 0); ctx.restore();
+        }
+
+        function drawPlan(data) {
+            const canvas = document.getElementById('canvasPlan');
+            const ctx = canvas.getContext('2d');
+            const cw = canvas.parentElement.clientWidth;
+            const ch = canvas.parentElement.clientHeight;
+            if (cw === 0 || ch === 0) return;
+            canvas.width = cw; canvas.height = ch;
+            ctx.clearRect(0, 0, cw, ch);
+            
+            const margin = 40; const scaleX = (cw - 2*margin) / data.L;
+            const stairW_px = data.W * scaleX;
+            const cx = cw/2; const cy = ch/2;
+            const startX = cx - (data.L * scaleX)/2;
+            
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+            ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            
+            const landingX = startX + data.L_flight * scaleX;
+            const landingW_px = data.L_landing * scaleX;
+            ctx.fillStyle = '#f1f5f9'; ctx.fillRect(landingX, cy - stairW_px/2, landingW_px, stairW_px); ctx.strokeRect(landingX, cy - stairW_px/2, landingW_px, stairW_px);
+            
+            ctx.lineWidth = 1; ctx.strokeStyle = '#94a3b8';
+            const numSteps = Math.round(data.L_flight * 1000 / data.tread);
+            const stepW = (data.L_flight * scaleX) / numSteps;
+            for(let i=1; i<numSteps; i++) {
+                ctx.beginPath(); ctx.moveTo(startX + i*stepW, cy - stairW_px/2); ctx.lineTo(startX + i*stepW, cy + stairW_px/2); ctx.stroke();
+                const f2_startX = landingX + landingW_px;
+                ctx.beginPath(); ctx.moveTo(f2_startX + i*stepW, cy - stairW_px/2); ctx.lineTo(f2_startX + i*stepW, cy + stairW_px/2); ctx.stroke();
+            }
+
+            ctx.setLineDash([5, 5]); ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(startX, cy - stairW_px/2 + 5); ctx.lineTo(startX + data.L * scaleX, cy - stairW_px/2 + 5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(startX, cy + stairW_px/2 - 5); ctx.lineTo(startX + data.L * scaleX, cy + stairW_px/2 - 5); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawStiffenerPlan(data) {
+            const canvas = document.getElementById('canvasStiffenerPlan');
+            const ctx = canvas.getContext('2d');
+            const cw = canvas.parentElement.clientWidth;
+            const ch = canvas.parentElement.clientHeight;
+            if (cw === 0 || ch === 0) return;
+            canvas.width = cw; canvas.height = ch;
+            ctx.clearRect(0, 0, cw, ch);
+
+            const marginX = 40;
+            const scaleX = (cw - 2*marginX) / data.L;
+            const stairW_px = data.W * scaleX;
+            const cx = cw/2;
+            const cy = ch/2 - 15; 
+            const startX = cx - (data.L * scaleX)/2;
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, cy - stairW_px/2, data.L * scaleX, stairW_px);
+
+            const x1 = startX + data.L_flight * scaleX;
+            const x2 = startX + (data.L_flight + data.L_landing) * scaleX;
+
+            ctx.strokeStyle = '#ef4444'; 
+            ctx.lineWidth = 4;
+            
+            ctx.beginPath(); ctx.moveTo(x1, cy - stairW_px/2); ctx.lineTo(x1, cy + stairW_px/2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x2, cy - stairW_px/2); ctx.lineTo(x2, cy + stairW_px/2); ctx.stroke();
+
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Stiffener Plate', x1, cy - stairW_px/2 - 10);
+            ctx.fillText('Stiffener Plate', x2, cy - stairW_px/2 - 10);
+
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#475569';
+            ctx.font = '13px sans-serif';
+            const dimY = cy + stairW_px/2 + 35;
+
+            const drawDim = (fromX, toX, text) => {
+                ctx.beginPath();
+                ctx.moveTo(fromX, cy + stairW_px/2 + 5); ctx.lineTo(fromX, dimY + 5);
+                ctx.moveTo(toX, cy + stairW_px/2 + 5); ctx.lineTo(toX, dimY + 5);
+                ctx.moveTo(fromX, dimY); ctx.lineTo(toX, dimY);
+                ctx.stroke();
+                
+                ctx.beginPath(); ctx.moveTo(fromX, dimY); ctx.lineTo(fromX+6, dimY-4); ctx.lineTo(fromX+6, dimY+4); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(toX, dimY); ctx.lineTo(toX-6, dimY-4); ctx.lineTo(toX-6, dimY+4); ctx.fill();
+                ctx.fillText(text, (fromX+toX)/2, dimY - 8);
+            };
+
+            const endX = startX + data.L * scaleX;
+            drawDim(startX, x1, `L1 = ${data.L_flight.toFixed(2)} m`);
+            drawDim(x1, x2, `ชานพัก = ${data.L_landing.toFixed(2)} m`);
+            drawDim(x2, endX, `L2 = ${data.L_flight.toFixed(2)} m`);
+        }
+
+        function drawFBD(data) {
+            const canvas = document.getElementById('canvasFBD');
+            const ctx = canvas.getContext('2d');
+            const cw = canvas.parentElement.clientWidth;
+            const ch = canvas.parentElement.clientHeight;
+            if (cw === 0 || ch === 0) return;
+            canvas.width = cw; canvas.height = ch;
+            ctx.clearRect(0, 0, cw, ch);
+            
+            const marginX = 80; const marginY = 80;
+            const scaleX = (cw - 2 * marginX) / data.L;
+            const scaleY = (ch - 2 * marginY) / data.H;
+            const scale = Math.min(scaleX, scaleY);
+            
+            const cx_val = cw/2; const cy_val = ch/2;
+            const mapPt = (x, y) => ({ x: cx_val + (x - data.L/2) * scale, y: cy_val - (y - data.H/2) * scale });
+
+            const p0 = mapPt(0, 0); 
+            const p1 = mapPt(data.L_flight, data.H_flight); 
+            const p2 = mapPt(data.L_flight + data.L_landing, data.H_flight); 
+            const p3 = mapPt(data.L, data.H); 
+
+            // Draw Structure
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
+            
+            // Kink Nodes
+            ctx.fillStyle = '#ef4444';
+            [p1, p2].forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill();
+            });
+
+            // Draw UDL (Gravity Load) mapped correctly to slopes
+            ctx.strokeStyle = '#f59e0b'; ctx.fillStyle = '#f59e0b'; ctx.lineWidth = 1.5;
+            
+            const getBeamY = (x_m) => {
+                if(x_m <= data.L_flight) return x_m * (data.H_flight/data.L_flight);
+                if(x_m <= data.L_flight + data.L_landing) return data.H_flight;
+                return data.H_flight + (x_m - data.L_flight - data.L_landing) * (data.H_flight/data.L_flight);
+            };
+
+            const arrowLen = 30;
+            
+            // วาดเส้นประกับด้านบนให้เอียงขนานไปกับความเอียงบันไดอย่างสมบูรณ์แบบ
+            ctx.beginPath();
+            ctx.moveTo(mapPt(0, getBeamY(0)).x, mapPt(0, getBeamY(0)).y - arrowLen);
+            ctx.lineTo(mapPt(data.L_flight, getBeamY(data.L_flight)).x, mapPt(data.L_flight, getBeamY(data.L_flight)).y - arrowLen);
+            ctx.lineTo(mapPt(data.L_flight + data.L_landing, getBeamY(data.L_flight + data.L_landing)).x, mapPt(data.L_flight + data.L_landing, getBeamY(data.L_flight + data.L_landing)).y - arrowLen);
+            ctx.lineTo(mapPt(data.L, getBeamY(data.L)).x, mapPt(data.L, getBeamY(data.L)).y - arrowLen);
+            ctx.stroke();
+
+            const numArrows = 24; const stepX = data.L / numArrows; 
+            for(let i=0; i<=numArrows; i++) {
+                const xm = i * stepX; 
+                const pt = mapPt(xm, getBeamY(xm));
+                
+                ctx.beginPath(); 
+                ctx.moveTo(pt.x, pt.y - arrowLen); 
+                ctx.lineTo(pt.x, pt.y - 4); 
+                ctx.stroke();
+                drawFBDArrowHead(ctx, pt.x, pt.y - 4, Math.PI/2);
+            }
+            
+            ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; 
+            ctx.fillText(`w_u = ${data.w_u.toFixed(2)} kg/m (Gravity)`, cx_val, p3.y - 45);
+
+            // Draw Reactions
+            ctx.strokeStyle = '#ef4444'; ctx.fillStyle = '#ef4444'; ctx.lineWidth = 2;
+            
+            // Bottom Support
+            drawFBDArrow(ctx, p0.x, p0.y + 40, p0.x, p0.y + 10);
+            ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(data.Ry,0)}`, p0.x, p0.y + 55);
+            
+            if (data.support_type === 'pinned' || data.support_type === 'fixed') {
+                drawFBDArrow(ctx, p0.x - 40, p0.y, p0.x - 10, p0.y);
+                ctx.textAlign = 'right'; ctx.fillText(`Hx = ${fmt(data.Hx,0)}`, p0.x - 45, p0.y + 4);
+            } else {
+                ctx.beginPath(); ctx.arc(p0.x - 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(p0.x + 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
+                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p0.x - 20, p0.y + 4);
+                ctx.fillStyle = '#ef4444';
+            }
+
+            if(data.support_type === 'fixed' || data.support_type === 'fixed-roller') {
+                ctx.beginPath(); ctx.arc(p0.x, p0.y, 25, 0.5*Math.PI, 1.5*Math.PI); ctx.stroke();
+                drawFBDArrowHead(ctx, p0.x, p0.y - 25, Math.PI);
+                ctx.fillText(`Mz = ${fmt(data.Mz,0)}`, p0.x - 30, p0.y - 25);
+            }
+
+            // Top Support
+            drawFBDArrow(ctx, p3.x, p3.y + 40, p3.x, p3.y + 10);
+            ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(data.Ry,0)}`, p3.x, p3.y + 55);
+            
+            if (data.support_type === 'pinned' || data.support_type === 'fixed') {
+                drawFBDArrow(ctx, p3.x + 40, p3.y, p3.x + 10, p3.y);
+                ctx.textAlign = 'left'; ctx.fillText(`Hx = ${fmt(data.Hx,0)}`, p3.x + 45, p3.y + 4);
+            } else {
+                ctx.beginPath(); ctx.arc(p3.x - 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(p3.x + 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
+                ctx.textAlign = 'left'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p3.x + 20, p3.y + 4);
+                ctx.fillStyle = '#ef4444';
+            }
+
+            if(data.support_type === 'fixed' || data.support_type === 'fixed-roller') {
+                ctx.beginPath(); ctx.arc(p3.x, p3.y, 25, 1.5*Math.PI, 0.5*Math.PI); ctx.stroke();
+                drawFBDArrowHead(ctx, p3.x, p3.y - 25, 0);
+                ctx.fillText(`Mz = ${fmt(data.Mz,0)}`, p3.x + 30, p3.y - 25);
+            }
+        }
+
+        function drawFBDArrow(ctx, fromX, fromY, toX, toY) {
+            ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            drawFBDArrowHead(ctx, toX, toY, angle);
+        }
+        function drawFBDArrowHead(ctx, x, y, angle) {
+            const size = 6; ctx.beginPath();
+            ctx.moveTo(x, y); ctx.lineTo(x - size * Math.cos(angle - Math.PI / 6), y - size * Math.sin(angle - Math.PI / 6)); ctx.lineTo(x - size * Math.cos(angle + Math.PI / 6), y - size * Math.sin(angle + Math.PI / 6)); ctx.fill();
+        }
+
+        function drawTrueDiagrams(data) {
+            const getPath = (x) => {
+                let y, angle;
+                if (x <= data.L_flight) {
+                    y = x * Math.tan(data.theta_rad);
+                    angle = data.theta_rad;
+                } else if (x <= data.L_flight + data.L_landing) {
+                    y = data.H_flight;
+                    angle = 0;
+                } else {
+                    y = data.H_flight + (x - data.L_flight - data.L_landing) * Math.tan(data.theta_rad);
+                    angle = data.theta_rad;
+                }
+                return { x, y, angle };
+            };
+
+            const forceData = data.forceData;
+
+            const drawGraph = (canvasId, type, maxVal, minVal, unit) => {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                const cw = canvas.parentElement.clientWidth;
+                const ch = canvas.parentElement.clientHeight;
+                if (cw === 0 || ch === 0) return;
+                
+                canvas.width = cw; canvas.height = ch;
+                ctx.clearRect(0, 0, cw, ch);
+                
+                const marginX = 60; const marginY = 60;
+                const scaleX = (cw - 2 * marginX) / data.L;
+                const scaleY = (ch - 2 * marginY) / data.H;
+                const scale = Math.min(scaleX, scaleY); 
+                
+                const cx_origin = cw/2; const cy_origin = ch/2;
+                const mapToCanvas = (x_m, y_m) => ({ 
+                    x: cx_origin + (x_m - data.L/2) * scale, 
+                    y: cy_origin - (y_m - data.H/2) * scale 
+                });
+
+                ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+                ctx.beginPath();
+                const p0 = mapToCanvas(0, 0);
+                const p1 = mapToCanvas(data.L_flight, data.H_flight);
+                const p2 = mapToCanvas(data.L_flight + data.L_landing, data.H_flight);
+                const p3 = mapToCanvas(data.L, data.H);
+                ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+                ctx.stroke();
+
+                const absMax = Math.max(Math.abs(maxVal), Math.abs(minVal), 0.001);
+                const valScale = 35 / absMax; 
+                const sign = (type === 'BMD') ? 1 : 1; 
+                
+                let plotPoints = [];
+                let baselinePoints = [];
+
+                forceData.forEach((dpt) => {
+                    const path = getPath(dpt.x);
+                    const basePtCanvas = mapToCanvas(path.x, path.y);
+                    baselinePoints.push(basePtCanvas);
+                    
+                    const val = dpt[type];
+                    const dx_canvas = sign * val * valScale * Math.sin(path.angle);
+                    const dy_canvas = sign * val * valScale * Math.cos(path.angle);
+                    
+                    plotPoints.push({
+                        x: basePtCanvas.x + dx_canvas,
+                        y: basePtCanvas.y + dy_canvas
+                    });
+                });
+
+                ctx.beginPath();
+                ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
+                for(let i=1; i<plotPoints.length; i++) ctx.lineTo(plotPoints[i].x, plotPoints[i].y);
+                for(let i=baselinePoints.length-1; i>=0; i--) ctx.lineTo(baselinePoints[i].x, baselinePoints[i].y);
+                ctx.closePath();
+
+                if (type === 'SFD') { ctx.fillStyle = 'rgba(59, 130, 246, 0.15)'; ctx.strokeStyle = '#2563eb'; } 
+                else if (type === 'BMD') { ctx.fillStyle = 'rgba(239, 68, 68, 0.15)'; ctx.strokeStyle = '#dc2626'; } 
+                else { 
+                    const grad = ctx.createLinearGradient(0, 0, 0, ch);
+                    grad.addColorStop(0, 'rgba(249, 115, 22, 0.2)'); 
+                    grad.addColorStop(1, 'rgba(56, 189, 248, 0.2)'); 
+                    ctx.fillStyle = grad; 
+                    ctx.strokeStyle = '#94a3b8'; 
+                }
+                
+                ctx.fill(); 
+                ctx.lineWidth = 1.5; 
+                
+                ctx.beginPath();
+                ctx.moveTo(plotPoints[0].x, plotPoints[0].y);
+                for(let i=1; i<plotPoints.length; i++) ctx.lineTo(plotPoints[i].x, plotPoints[i].y);
+                ctx.stroke();
+
+                ctx.strokeStyle = (type === 'AFD') ? 'rgba(148, 163, 184, 0.5)' : ctx.fillStyle.replace('0.15', '0.4'); 
+                ctx.lineWidth = 0.5;
+                for(let i=0; i<plotPoints.length; i+=2) { 
+                    if (type === 'AFD') {
+                        ctx.strokeStyle = forceData[i].AFD > 0 ? 'rgba(249, 115, 22, 0.6)' : 'rgba(56, 189, 248, 0.6)';
+                    }
+                    ctx.beginPath(); ctx.moveTo(baselinePoints[i].x, baselinePoints[i].y); ctx.lineTo(plotPoints[i].x, plotPoints[i].y); ctx.stroke();
+                }
+
+                ctx.fillStyle = '#1e293b'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
+                if(Math.abs(maxVal) > 0.01) ctx.fillText(`Max: ${maxVal.toFixed(2)} ${unit}`, 20, 25);
+                if(Math.abs(minVal) > 0.01) ctx.fillText(`Min: ${minVal.toFixed(2)} ${unit}`, 20, ch - 15);
+            };
+            
+            drawGraph('canvasAFD', 'AFD', data.maxA, data.minA, 'kg');
+            drawGraph('canvasSFD', 'SFD', data.maxS, data.minS, 'kg');
+            drawGraph('canvasBMD', 'BMD', data.maxB, data.minB, 'kg-m');
+        }
+
+        function generateReport(data) {
+            
+            let mu_eqn = '';
+            if(data.support_type === 'pinned-roller' || data.support_type === 'pinned') {
+                mu_eqn = `M_u = \\frac{w_u L^2}{8} = \\frac{${fmt(data.w_u, 2)} \\times ${data.L.toFixed(2)}^2}{8}`;
+            } else {
+                mu_eqn = `M_u = M_z = \\frac{w_u L^2}{12} = \\frac{${fmt(data.w_u, 2)} \\times ${data.L.toFixed(2)}^2}{12}`;
+            }
+
+            const reportHTML = `
+                <div class="report-header text-center">
+                    <h1 class="text-2xl font-bold uppercase">รายการคำนวณการออกแบบบันไดเหล็ก</h1>
+                    <p class="text-gray-600 mt-1">อ้างอิงมาตรฐาน: AISC 360-16 (Load and Resistance Factor Design)</p>
+                </div>
+
+                <div class="report-section">
+                    <h3>1. ข้อมูลรูปทรงและน้ำหนักบรรทุก (Geometry & Loads)</h3>
+                    <table class="calc-table">
+                        <tr><td>ระยะพาดตามแนวราบ (Span), $ L $</td><td>${data.L.toFixed(2)} m</td><td>ความกว้างบันได, $ W $</td><td>${data.W.toFixed(2)} m</td></tr>
+                        <tr><td>ความสูงระหว่างชั้น, $ H $</td><td>${data.H.toFixed(2)} m</td><td>ความยาวชานพัก</td><td>${data.L_landing.toFixed(2)} m</td></tr>
+                        <tr><td>มุมเอียงบันได (Inclination), $ \\theta $</td><td colspan="3">${data.theta_deg.toFixed(2)}^\\circ</td></tr>
+                        <tr><td>น้ำหนักบรรทุกจร (Live Load)</td><td>${data.LL} kg/m²</td><td>น้ำหนักตกแต่ง (SDL)</td><td>${data.SDL} kg/m²</td></tr>
+                    </table>
+                </div>
+
+                <div class="report-section">
+                    <h3>2. คุณสมบัติหน้าตัดเหล็กที่ใช้ (Section Properties)</h3>
+                    <div class="flex items-center space-x-6 mb-4 bg-gray-50 p-4 rounded-lg border">
+                        <div class="w-1/3 text-center">
+                            <svg viewBox="0 0 200 200" class="w-full max-w-[150px] mx-auto">
+                                <rect x="50" y="20" width="100" height="160" fill="none" stroke="#1e3a8a" stroke-width="4"/>
+                                <rect x="58" y="28" width="84" height="144" fill="#e2e8f0" stroke="#1e3a8a" stroke-width="2"/>
+                                <line x1="50" y1="10" x2="150" y2="10" stroke="#64748b" stroke-width="1"/>
+                                <text x="100" y="8" font-size="10" text-anchor="middle" fill="#475569">b = ${data.b} mm</text>
+                                <line x1="35" y1="20" x2="35" y2="180" stroke="#64748b" stroke-width="1"/>
+                                <text x="32" y="100" font-size="10" text-anchor="middle" fill="#475569" transform="rotate(-90 32,100)">d = ${data.d} mm</text>
+                                <text x="100" y="100" font-size="10" text-anchor="middle" fill="#1e3a8a">t = ${data.t} mm</text>
+                            </svg>
+                            <p class="font-bold mt-2 text-sm text-gray-700">RHS / BOX ${data.d}x${data.b}x${data.t}</p>
+                        </div>
+                        <div class="w-2/3">
+                            <p class="mb-2"><strong>พื้นที่หน้าตัด (Area), $ A $:</strong></p>
+                            <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                                $$ A = (d \\times b) - (d_{in} \\times b_{in}) = ${data.Area.toFixed(2)} \\text{ cm}^2 $$
+                            </div>
+                            <p class="mb-2 mt-4"><strong>พลาสติกมอดูลัส (Plastic Modulus), $ Z_x $:</strong></p>
+                            <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                                $$ Z_x = \\frac{b d^2}{4} - \\frac{b_{in} d_{in}^2}{4} = ${fmt(data.Zx, 2)} \\text{ cm}^3 $$
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>3. การประเมินน้ำหนักบรรทุกและแรงออกแบบประลัย <span class="ref-text">[อ้างอิง: ASCE 7-16 Section 2.3.1]</span></h3>
+                    
+                    <p class="mb-2 mt-3"><strong>3.1 การกระจายน้ำหนักลงแม่บันได 1 ข้าง (Tributary Loads)</strong></p>
+                    <p class="text-sm text-gray-700 mb-2">แม่บันได 1 ข้างจะรับน้ำหนักครึ่งหนึ่งของความกว้างบันไดทั้งหมด (Tributary Width, $ W_{trib} = W / 2 = ${fmt(data.W,2)} / 2 = ${fmt(data.w_trib,2)} \\text{ m} $)</p>
+                    
+                    <div class="ml-4 mb-4 bg-gray-50 p-4 rounded border border-gray-200">
+                        <p class="font-bold text-sm text-gray-800 mb-1">น้ำหนักคงที่ (Dead Load, DL):</p>
+                        <ul class="text-sm text-gray-600 list-disc ml-5 mb-2">
+                            <li>น้ำหนักเหล็ก (รวมเผื่อรอยเชื่อม 10%): $ ${fmt(data.w_steel,2)} \\times 1.1 = ${fmt(data.DL_steel, 2)} \\text{ kg/m} $</li>
+                            <li>น้ำหนักวัสดุตกแต่ง (SDL): $ ${data.SDL} \\text{ kg/m}^2 \\times ${fmt(data.w_trib,2)} \\text{ m} = ${fmt(data.DL_stair, 2)} \\text{ kg/m} $</li>
+                        </ul>
+                        <p class="text-sm mt-1">รวมน้ำหนักคงที่ ($ w_{DL} $) $ = ${fmt(data.DL_steel, 2)} + ${fmt(data.DL_stair, 2)} = \\mathbf{${fmt(data.DL_total, 2)} \\text{ kg/m}} $</p>
+                        
+                        <p class="font-bold text-sm text-gray-800 mt-3 mb-1">น้ำหนักจร (Live Load, LL):</p>
+                        <ul class="text-sm text-gray-600 list-disc ml-5 mb-2">
+                            <li>น้ำหนักจรบนบันได: $ ${data.LL} \\text{ kg/m}^2 \\times ${fmt(data.w_trib,2)} \\text{ m} = \\mathbf{${fmt(data.LL_stringer, 2)} \\text{ kg/m}} $</li>
+                        </ul>
+                        <div class="text-xs text-blue-700 italic bg-blue-50 p-2 rounded mt-2">
+                            * หมายเหตุสำหรับการคำนวณระยะโก่งตัว: น้ำหนัก $ w_{LL} = ${fmt(data.LL_stringer, 2)} \\text{ kg/m} $ จะถูกแปลงหน่วยโดยหารด้วย 100 เท่ากับ <strong>$ ${fmt(data.w_LL_cm, 2)} \text{ kg/cm} $</strong>
+                        </div>
+                    </div>
+
+                    <p class="mb-2 mt-4"><strong>3.2 น้ำหนักประลัยกระจายสม่ำเสมอ ($ w_u $)</strong></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ w_u = 1.2(DL) + 1.6(LL) = 1.2(${fmt(data.DL_total, 2)}) + 1.6(${fmt(data.LL_stringer, 2)}) = \\mathbf{${fmt(data.w_u, 2)} \\text{ kg/m}} $$
+                    </div>
+                    
+                    <p class="mb-2 mt-4 text-blue-800 font-bold">3.3 แรงภายในสูงสุดจากแบบจำลองโครงสร้างจริง (True Kinked-Beam Maximum Forces)</p>
+                    <div class="ml-4 mb-4 bg-blue-50 p-4 rounded border border-blue-200">
+                        <p class="text-sm text-gray-600 mb-2">โมเมนต์ดัดสูงสุด ($ M_u $) ตรวจสอบจากแผนภาพ BMD (ตรงกับสมการ $w_u L^2/12$ หรือ $w_u L^2/8$ ขึ้นกับจุดรองรับ):</p>
+                        $$ ${mu_eqn} = \\mathbf{${fmt(data.Mu, 2)} \\text{ kg-m}} $$
+
+                        <p class="text-sm text-gray-600 mb-2 mt-4">แรงอัดตามแนวแกนสูงสุด ($ P_u $) บริเวณโคนบันได (พิจารณาแรงถีบ $H_x$ ร่วมกับแรงดิ่ง $R_y$):</p>
+                        $$ P_u = H_x \\cos(\\theta) + R_y \\sin(\\theta) = ${fmt(data.Hx, 2)} \\cos(${data.theta_deg.toFixed(2)}^\\circ) + ${fmt(data.Ry, 2)} \\sin(${data.theta_deg.toFixed(2)}^\\circ) = \\mathbf{${fmt(data.Pu, 2)} \\text{ kg}} $$
+                        
+                        <p class="text-sm text-gray-600 mb-2 mt-4">แรงเฉือนแนวฉากชิ้นส่วนสูงสุด ($V_{u,local}$) เกิดจากการหักล้างของแรงปฏิกิริยาดิ่งและแรงถีบที่จุดหักมุม (Kink Point) อ่านค่าพีคแบบละเอียดระดับทศนิยมจากแผนภาพ SFD ได้เท่ากับ:</p>
+                        $$ V_u = \\max(|V_{local}|) = \\mathbf{${fmt(data.Vu, 2)} \\text{ kg}} $$
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>4. ตรวจสอบกำลังรับน้ำหนัก (Combined Axial & Bending Interaction)</h3>
+                    
+                    <p class="mb-2"><strong>4.1 กำลังรับแรงอัดประลัย (Axial Compressive Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section E3, Eq. E3-1]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ \\phi_c P_n = 0.90 (F_y \\cdot A) = 0.90 (${fmt(data.Fy,0)} \\times ${fmt(data.Area,2)}) = ${fmt(data.phi_Pn, 2)} \\text{ kg} $$
+                        $$ \\text{Ratio}_{axial} = \\frac{P_u}{\\phi_c P_n} = \\frac{${fmt(data.Pu,2)}}{${fmt(data.phi_Pn,2)}} = ${data.ratio_axial.toFixed(3)} $$
+                    </div>
+
+                    <p class="mb-2 mt-4"><strong>4.2 กำลังรับโมเมนต์ดัดประลัย (Flexural Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section F7.1, Eq. F7-1]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ \\phi_b M_n = 0.90 (F_y \\cdot Z_x) = 0.90 \\times (${fmt(data.Fy,0)} \\times ${fmt(data.Zx,2)}) / 100 = ${fmt(data.phi_Mn, 2)} \\text{ kg-m} $$
+                        $$ \\text{Ratio}_{flexure} = \\frac{M_u}{\\phi_b M_n} = \\frac{${fmt(data.Mu,2)}}{${fmt(data.phi_Mn,2)}} = ${data.ratio_flexure.toFixed(3)} $$
+                    </div>
+
+                    <p class="mb-2 mt-4"><strong>4.3 กำลังรับแรงเฉือนประลัย (Shear Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section G4, Eq. G4-1]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ \\phi_v V_n = 0.90 (0.6 F_y A_w) = 0.90 (0.6 \\times ${fmt(data.Fy,0)} \\times ${fmt(2*data.d/10*data.t/10,2)}) = ${fmt(data.phi_Vn, 2)} \\text{ kg} $$
+                        $$ \\text{Ratio}_{shear} = \\frac{V_u}{\\phi_v V_n} = \\frac{${fmt(data.Vu,2)}}{${fmt(data.phi_Vn,2)}} = \\textcolor{${data.ratio_shear <= 1 ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.ratio_shear.toFixed(3)} \\quad ${data.ratio_shear <= 1 ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
+                    </div>
+
+                    <p class="mb-2 mt-4"><strong>4.4 สมการร่วม (Interaction Equation)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section H1.1, Eq. H1-1a/b]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        <p>เนื่องจาก $ \\frac{P_u}{\\phi_c P_n} $ ${data.ratio_axial >= 0.2 ? '\\ge 0.2' : '< 0.2'} จึงใช้สมการ:</p>
+                        ${data.ratio_axial >= 0.2 
+                            ? `$$ \\text{D/C Ratio} = \\frac{P_u}{\\phi_c P_n} + \\frac{8}{9}\\left(\\frac{M_u}{\\phi_b M_n}\\right) = ${data.ratio_axial.toFixed(3)} + \\frac{8}{9}(${data.ratio_flexure.toFixed(3)}) $$` 
+                            : `$$ \\text{D/C Ratio} = \\frac{P_u}{2 \\phi_c P_n} + \\frac{M_u}{\\phi_b M_n} = \\frac{${data.ratio_axial.toFixed(3)}}{2} + ${data.ratio_flexure.toFixed(3)} $$`
+                        }
+                        $$ \\text{D/C Ratio} = \\mathbf{${data.ratio_interaction.toFixed(3)}} \\quad \\textcolor{${data.ratio_interaction <= 1 ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.ratio_interaction <= 1 ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
+                    </div>
+                </div>
+
+                <div class="report-section bg-orange-50 border border-orange-200 p-6 rounded-xl">
+                    <h3 class="text-orange-800 border-orange-200">5. แรงเค้นเฉพาะจุดและการออกแบบจุดหักมุม (Kink Point) <span class="ref-text" style="color: #c2410c;">[อ้างอิง: AISC 360-16 Section J10.2, Eq. J10-2]</span></h3>
+                    <p class="mb-3 text-gray-700">ณ ตำแหน่งรอยต่อระหว่างบันไดช่วงเอียงและชานพัก (Kink Point) แรงดึงและแรงอัดในปีกคานจะทำให้เกิดแรงลัพธ์ในแนวฉาก (Radial Force) ซึ่งอาจทำให้หน้าตัดเหล็กฉีกขาดหรือบิดเสียรูปได้ จึงจำเป็นต้องเชื่อมแผ่นเสริมกำลัง (Stiffener Plate)</p>
+                    
+                    <p class="mb-2"><strong>โมเมนต์ดัดที่จุดหักมุม ($ M_{kink} $):</strong> ${fmt(data.M_kink, 2)} kg-m</p>
+                    <p class="mb-2"><strong>แรงดึงในปีกคาน (Flange Force, $ P_f $):</strong></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-orange-200">
+                        $$ P_f = \\frac{M_{kink}}{d - t} = \\frac{${fmt(data.M_kink, 2)}}{${data.d_eff.toFixed(3)}} = ${fmt(data.Pf, 2)} \\text{ kg} $$
+                    </div>
+                    
+                    <p class="mb-2 mt-4"><strong>แรงลัพธ์ในแนวฉาก (Radial Force, $ F_r $):</strong></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-orange-200">
+                        $$ F_r = 2 P_f \\sin\\left(\\frac{\\theta}{2}\\right) = 2(${fmt(data.Pf, 2)}) \\sin\\left(\\frac{${data.theta_deg.toFixed(2)}^\\circ}{2}\\right) = \\mathbf{${fmt(data.Fr, 2)} \\text{ kg}} $$
+                    </div>
+                    
+                    <svg viewBox="0 0 450 240" class="w-full max-w-[550px] mx-auto bg-white border border-gray-200 rounded-xl shadow-sm my-5">
+                        <defs>
+                            <marker id="arrow-pf" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                <polygon points="0 0, 8 4, 0 8" fill="#2563eb" />
+                            </marker>
+                            <marker id="arrow-fr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                <polygon points="0 0, 8 4, 0 8" fill="#dc2626" />
+                            </marker>
+                        </defs>
+                        <text x="20" y="30" font-size="14" fill="#334155" font-weight="bold">แผนภาพจำลองแรงที่จุดหักมุม (Kink Point Radial Force)</text>
+                        <g transform="translate(30, 20)">
+                            <polygon points="50,40 180,115 350,115 350,165 195,165 50,81.5" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" />
+                            <line x1="180" y1="115" x2="195" y2="165" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+                            <path d="M 190,140 L 230,100 L 250,100" fill="none" stroke="#f97316" stroke-width="1.5" />
+                            <text x="255" y="104" font-size="12" fill="#ea580c" font-weight="bold">แผ่นดาม (Stiffener Plate)</text>
+                            <line x1="205" y1="165" x2="280" y2="165" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
+                            <text x="285" y="170" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
+                            <line x1="185" y1="159" x2="110" y2="116" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
+                            <text x="85" y="115" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
+                            <path d="M 165,165 A 30,30 0 0,0 169,150" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="2,2"/>
+                            <text x="145" y="160" font-size="12" fill="#64748b">θ/2</text>
+                            <line x1="195" y1="165" x2="175" y2="80" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-fr)" />
+                            <rect x="80" y="45" width="120" height="25" fill="#fef2f2" rx="4" />
+                            <text x="85" y="62" font-size="14" fill="#dc2626" font-weight="bold">Fr = ${fmt(data.Fr, 0)} kg</text>
+                        </g>
+                    </svg>
+
+                    <div class="mt-4 p-4 bg-white border border-red-300 rounded-lg shadow-sm">
+                        <p class="text-red-700 font-bold mb-2">⚠️ การออกแบบขนาดแผ่นดาม (Stiffener Sizing):</p>
+                        <p class="text-gray-800 text-sm mb-2">ออกแบบแผ่นดามเพื่อรับแรงอัด $ F_r $ (อ้างอิง $ \\phi = 0.90 $ สำหรับ Local Yielding)</p>
+                        <div class="mt-2 mb-4 pl-4 border-l-2 border-red-200">
+                            $$ A_{req} = \\frac{F_r}{\\phi F_y} = \\frac{${fmt(data.Fr, 2)}}{0.90 \\times ${fmt(data.Fy, 0)}} = ${fmt(data.A_req_cm2, 3)} \\text{ cm}^2 $$
+                        </div>
+                        <p class="text-gray-800 text-sm mt-3 mb-2">เนื่องจากแผ่นดามเชื่อมติดด้านในของเหล็กกล่อง จึงถูกบังคับความกว้างให้เท่ากับ $ b_{inner} = ${data.b_inner_mm} \\text{ mm} $</p>
+                        <div class="mt-2 mb-4 pl-4 border-l-2 border-red-200">
+                            $$ t_{req} = \\frac{A_{req}}{b_{inner}} = \\frac{${fmt(data.A_req_cm2, 3)}}{${data.b_inner_mm / 10}} \\times 10 = ${fmt(data.t_req_mm, 2)} \\text{ mm} $$
+                        </div>
+                        
+                        <div class="mt-4 bg-red-50 p-3 rounded-md border border-red-200">
+                            <p class="text-red-800 font-semibold text-sm">ข้อแนะนำการระบุในแบบ (Recommendation):</p>
+                            <p class="text-gray-800 text-sm mt-1">ควรใช้แผ่นเหล็ก Stiffener Plate หนาไม่น้อยกว่า <strong>${data.t_st_rec} mm</strong> (เชื่อมรอบตัว)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>6. ตรวจสอบสภาพการใช้งาน (Serviceability & Vibration)</h3>
+                    
+                    <p class="mb-2 mt-3"><strong>6.1 การโก่งตัวภายใต้น้ำหนักจร (Live Load Deflection)</strong> <span class="ref-text">[อ้างอิง: IBC 2018 Table 1604.3]</span></p>
+                    <p>เกณฑ์ยอมรับ $ \\Delta_{limit} = L/400 = \\frac{${fmt(data.L*1000,0)}}{400} = ${data.def_limit_mm.toFixed(2)} \\text{ mm} $</p>
+                    <p class="text-gray-600 text-sm mt-1 mb-2">สูตรการคำนวณ (แปลงหน่วย $ w_{LL} $ เป็น kg/cm และ $ L $ เป็น cm):</p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 w_{LL} L^4}{384 E I_x}' : '\\frac{1 w_{LL} L^4}{384 E I_x}'} $$
+                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E,0) + ') (' + fmt(data.Ix,2) + ')}' : '\\frac{1 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E,0) + ') (' + fmt(data.Ix,2) + ')}'} = ${data.delta_LL_max_cm.toFixed(3)} \\text{ cm} = \\mathbf{${data.delta_LL_max_mm.toFixed(2)} \\text{ mm}} \\quad \\textcolor{${data.delta_LL_max_mm <= data.def_limit_mm ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.delta_LL_max_mm <= data.def_limit_mm ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
+                    </div>
+
+                    <p class="mb-2 mt-4"><strong>6.2 ความถี่ธรรมชาติสำหรับการสั่นสะเทือน (Natural Frequency)</strong> <span class="ref-text">[อ้างอิง: AISC Design Guide 11 (2nd Ed.) Section 3.1, Eq. 3-4]</span></p>
+                    <p>อ้างอิงสมการพื้นฐาน $ f_n = \\frac{\\pi}{2}\\sqrt{\\frac{EI}{mL^4}} $ สำหรับมวลกระจายสม่ำเสมอ ซึ่งจัดรูปใหม่ได้เป็น $ f_n \\approx \\frac{17.76}{\\sqrt{\\Delta_{\\text{active(mm)}}}} $</p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
+                        $$ f_n = \\frac{17.76}{\\sqrt{\\Delta_{active\\text{(mm)}}}} = \\frac{17.76}{\\sqrt{${data.delta_active_mm.toFixed(3)}}} = \\mathbf{${data.fn.toFixed(2)} \\text{ Hz}} $$
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1"><em>* แนะนำให้ $ f_n \\ge 5.0\\text{ Hz} $ สำหรับ Monumental Staircase เพื่อหลีกเลี่ยงอาการสั่นสะเทือนขณะเดิน</em></p>
+                </div>
+            `;
+            
+            document.getElementById('report_container').innerHTML = reportHTML;
+
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.getElementById('report_container'), {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateAndDraw);
+                input.addEventListener('change', calculateAndDraw);
+            });
+            window.addEventListener('resize', calculateAndDraw);
+            calculateAndDraw(); 
+            
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.getElementById('nomenclature'), {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
+    </script>
+</body>
+</html>
