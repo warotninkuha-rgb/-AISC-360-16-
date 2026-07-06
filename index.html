@@ -64,7 +64,7 @@
                 </div>
             </div>
 
-            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">จุดรองรับ (SUPPORT CONDITION)</h2>
+            <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">จุดรองรับ & การค้ำยัน</h2>
             <div class="space-y-4 mb-6">
                 <div>
                     <select id="support_type" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium text-xs">
@@ -74,13 +74,22 @@
                         <option value="fixed" selected>ยึดแน่น (Fixed-Fixed) - มีโมเมนต์และแรงถีบ Hx</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-gray-600 mb-1" title="Unbraced Length (Lb) สำหรับการคำนวณ Column Buckling">ระยะไร้ค้ำยัน, Lb (m)</label>
+                    <input type="number" id="unbraced_L" value="4.5" step="0.1" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500" placeholder="ค่าเริ่มต้น: L_flight">
+                    <p class="text-[10px] text-gray-400 mt-1">ปล่อยว่างเพื่อใช้ความยาวช่วงบันไดอัตโนมัติ</p>
+                </div>
             </div>
 
             <h2 class="font-bold text-gray-700 mb-3 uppercase tracking-wider text-xs border-b pb-1">น้ำหนักบรรทุก</h2>
             <div class="space-y-4 mb-6">
                 <div>
-                    <label class="block text-gray-600 mb-1">น้ำหนักจร, LL (kg/m²)</label>
+                    <label class="block text-gray-600 mb-1">น้ำหนักจร (กระจาย), LL (kg/m²)</label>
                     <input type="number" id="load_LL" value="300" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-600 mb-1">น้ำหนักจร (แบบจุด), PL (kg)</label>
+                    <input type="number" id="load_PL" value="150" class="w-full border rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
                     <label class="block text-gray-600 mb-1">น้ำหนักวัสดุตกแต่ง, SDL (kg/m²)</label>
@@ -111,19 +120,25 @@
                         <input type="number" id="sec_t" value="12" class="w-full border rounded px-2 py-1.5">
                     </div>
                 </div>
+                <!-- Warning Label for Auto-Correction -->
+                <div id="sec_t_warning" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 p-2 rounded"></div>
             </div>
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col h-full bg-gray-50 print-full-width min-w-0">
-        <div class="bg-white border-b px-6 py-3 flex justify-between items-center no-print shrink-0 overflow-x-auto">
+    <div class="flex-1 flex flex-col h-full bg-gray-50 print-full-width min-w-0 relative">
+        
+        <!-- Alerts Banner Area -->
+        <div id="alert_banner_container" class="absolute top-0 left-0 w-full z-50 flex flex-col items-center pt-2 space-y-2 pointer-events-none"></div>
+
+        <div class="bg-white border-b px-6 py-3 flex justify-between items-center no-print shrink-0 overflow-x-auto z-10">
             <div class="flex space-x-1 border rounded-lg bg-gray-100 p-1 shrink-0">
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white shadow-sm text-blue-700 transition-colors">Dashboard</button>
                 <button onclick="switchTab('diagrams')" id="tab-diagrams" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Force Diagrams (FBD/SFD/BMD)</button>
                 <button onclick="switchTab('report')" id="tab-report" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Calculation Report</button>
-                <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">สัญลักษณ์ & การออกแบบจุดต่อ</button>
+                <button onclick="switchTab('nomenclature')" id="tab-nomenclature" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Nomenclature & Connections</button>
             </div>
-            <button onclick="printReport()" class="flex items-center px-4 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 shadow-sm transition-colors shrink-0 ml-4">
+            <button onclick="printReport()" class="flex items-center px-4 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 shadow-sm transition-colors shrink-0 ml-4 pointer-events-auto">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                 พิมพ์รายงาน (PDF)
             </button>
@@ -133,7 +148,7 @@
             
             <!-- Dashboard Tab -->
             <div id="dashboard" class="tab-content active">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shrink-0 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0 mb-4">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-500 font-medium" title="ตรวจสอบพฤติกรรมแรงอัดร่วมกับแรงดัด (Interaction)">อัตราส่วนหน่วยแรง (D/C RATIO)</p>
@@ -164,6 +179,18 @@
                             <p class="text-xs text-gray-400 mt-1" id="out_vib_status">ความแข็งเกร็งสูง</p>
                         </div>
                         <div id="badge_vib" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">> 5Hz</div>
+                    </div>
+                    <!-- Ergonomics Card -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">กฎสรีรศาสตร์ (2R+T)</p>
+                            <div class="flex items-baseline mt-1">
+                                <span id="out_ergo" class="text-3xl font-bold text-gray-900">0.0</span>
+                                <span class="text-gray-500 ml-1 font-medium">mm</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">R = <span id="out_riser">0</span>, T = <span id="out_tread">0</span> (Target 600-650)</p>
+                        </div>
+                        <div id="badge_ergo" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700">PASS</div>
                     </div>
                 </div>
                 
@@ -196,7 +223,7 @@
                         กราฟที่แสดงด้านล่างนี้ พล็อตจากการประมวลผล <strong>"แบบจำลองโครงสร้างจริง (DSM Matrix Solver)"</strong> ซึ่งสะท้อนพฤติกรรมสมดุลแรงตามความเอียงและจุดหักมุมจริง 100% (ตรงกับโปรแกรม 3D Finite Element)
                     </p>
                     <p class="mt-1 text-xs text-blue-600 italic">
-                        *หมายเหตุ: ค่าออกแบบประลัย (<i>M<sub>u</sub>, V<sub>u</sub>, P<sub>u</sub></i>) ที่สรุปใน "แท็บรายการคำนวณ" อาจมีค่าสูงกว่าในกราฟนี้ เนื่องจากโปรแกรมใช้หลักการ Envelope นำค่าสูงสุดระหว่างโมเดลจริงและทฤษฎีคานราบ (Equivalent Beam) มาเผื่อความปลอดภัยสูงสุดครับ
+                        *หมายเหตุ: ค่าออกแบบประลัย (<sub>$M_u, V_u, P_u$</sub>) ที่สรุปใน "แท็บรายการคำนวณ" อาจมีค่าสูงกว่าในกราฟนี้ เนื่องจากโปรแกรมใช้หลักการ Envelope นำค่าสูงสุดระหว่างโมเดลจริง ทฤษฎีคานราบ และแรงกระทำแบบจุด มาเผื่อความปลอดภัยสูงสุดครับ
                     </p>
                 </div>
                 <div class="block space-y-6 pb-10 w-full">
@@ -277,14 +304,48 @@
             return m;
         };
         const trans = (a) => a[0].map((_, c) => a.map(r => r[c]));
+        
+        function showBanner(message, type='warning') {
+            const container = document.getElementById('alert_banner_container');
+            const div = document.createElement('div');
+            const bg = type === 'error' ? 'bg-red-500' : 'bg-amber-500';
+            div.className = `${bg} text-white px-4 py-2 rounded shadow-md pointer-events-auto text-sm font-medium animate-fade-in transition-opacity duration-300`;
+            div.innerHTML = `<span class="mr-2">${type === 'error' ? '🚨' : '⚠️'}</span>${message}`;
+            container.appendChild(div);
+            // Limit to 3 banners
+            if (container.children.length > 3) container.removeChild(container.firstChild);
+            // Auto remove after 5s
+            setTimeout(() => {
+                div.style.opacity = '0';
+                setTimeout(() => div.remove(), 300);
+            }, 5000);
+        }
+        
+        function clearBanners() {
+            document.getElementById('alert_banner_container').innerHTML = '';
+        }
+
+        function validateInputs(L, H, W, L_landing) {
+            const warnings = [];
+            if (L_landing >= L * 0.8) warnings.push('ความยาวชานพักมากเกินไปเทียบกับระยะพาดรวม อาจเกิดข้อผิดพลาดทางเรขาคณิต');
+            if (W <= 0.6) warnings.push('ความกว้างบันไดแคบเกินไป (< 0.6m)');
+            if ((L - L_landing) <= 0.2) warnings.push('ระยะช่วงบันได (Flight Length) สั้นเกินไป โปรดตรวจสอบค่า L และความยาวชานพัก');
+            const H_flight = H / 2;
+            const L_flight = (L - L_landing) / 2;
+            if (H_flight / L_flight > 1.2) warnings.push('บันไดชันเกินไป (>50 องศา) อาจผิดกฎหมายควบคุมอาคาร');
+            return warnings;
+        }
 
         function calculateAndDraw() {
+            clearBanners();
             try {
+                // 1. Get Inputs
                 const L = parseFloat(document.getElementById('span_L').value) || 0;
                 const H = parseFloat(document.getElementById('height_H').value) || 0;
                 const W = parseFloat(document.getElementById('width_W').value) || 0;
                 const L_landing = parseFloat(document.getElementById('landing_L').value) || 0;
                 const LL = parseFloat(document.getElementById('load_LL').value) || 0;
+                const Point_L = parseFloat(document.getElementById('load_PL').value) || 0;
                 const SDL = parseFloat(document.getElementById('load_SDL').value) || 0;
                 const Fy = parseFloat(document.getElementById('steel_grade').value) || 2450;
                 const E_ksc = 2040000; 
@@ -292,15 +353,34 @@
                 const b = parseFloat(document.getElementById('sec_b').value) || 0; 
                 let t = parseFloat(document.getElementById('sec_t').value) || 0; 
                 const support_type = document.getElementById('support_type').value;
+                const Lb_input = parseFloat(document.getElementById('unbraced_L').value);
 
                 if (L <= 0 || H <= 0 || W <= 0 || d <= 0 || b <= 0 || t <= 0) return;
-                if (t * 2 >= d || t * 2 >= b) t = Math.min(d, b) / 2.1; 
+                
+                // Input Validation
+                const warnings = validateInputs(L, H, W, L_landing);
+                warnings.forEach(w => showBanner(w, 'warning'));
+
+                // Auto-correct Thickness
+                let t_corrected = false;
+                if (t * 2 >= d || t * 2 >= b) { 
+                    t = Math.min(d, b) / 2.1; 
+                    t_corrected = true;
+                }
+                const warningDiv = document.getElementById('sec_t_warning');
+                if (t_corrected) {
+                    warningDiv.classList.remove('hidden');
+                    warningDiv.innerText = `⚠️ ค่าความหนา (t) เกินขนาดหน้าตัด โปรแกรมปรับเป็น ${t.toFixed(1)} mm อัตโนมัติ`;
+                } else {
+                    warningDiv.classList.add('hidden');
+                }
 
                 const L_flight = Math.max(0.1, (L - L_landing) / 2); 
                 const H_flight = H / 2; 
                 const theta_rad = Math.atan2(H_flight, L_flight);
                 const theta_deg = theta_rad * 180 / Math.PI;
 
+                // Ergonomics
                 let numRisers = Math.round(H_flight / 0.175); 
                 if(numRisers < 1) numRisers = 1;
                 const riser = (H_flight / numRisers) * 1000; 
@@ -312,8 +392,37 @@
                 const Area = (dc*bc) - (d_inner*b_inner); 
                 const w_steel = Area * 7850 / 10000; 
                 const Ix = (bc * Math.pow(dc, 3) / 12) - (b_inner * Math.pow(d_inner, 3) / 12); 
+                const Iy = (dc * Math.pow(bc, 3) / 12) - (d_inner * Math.pow(b_inner, 3) / 12);
                 const Zx = (bc * Math.pow(dc, 2) / 4) - (b_inner * Math.pow(d_inner, 2) / 4); 
+                const Sx = (bc * Math.pow(dc, 2) / 6) - (b_inner * Math.pow(d_inner, 2) / 6); 
 
+                // Compactness Check
+                const lambda_flange = b_inner / tc;
+                const lambda_web = d_inner / tc;
+                const lambda_p_f = 1.12 * Math.sqrt(E_ksc / Fy);
+                const lambda_p_w = 2.42 * Math.sqrt(E_ksc / Fy);
+                const isCompact = (lambda_flange <= lambda_p_f) && (lambda_web <= lambda_p_w);
+
+                // Column Buckling Check
+                const rx = Math.sqrt(Ix / Area);
+                const ry = Math.sqrt(Iy / Area);
+                const r_min = Math.min(rx, ry);
+                const Lb_m = !isNaN(Lb_input) ? Lb_input : Math.sqrt(L_flight**2 + H_flight**2);
+                
+                let K_factor = 1.0;
+                if(support_type === 'fixed') K_factor = 0.65;
+                else if(support_type === 'pinned-roller') K_factor = 2.0;
+                
+                const KL_r = (K_factor * Lb_m * 100) / r_min;
+                const Fe = (Math.PI**2 * E_ksc) / Math.pow(KL_r, 2);
+                let Fcr = 0;
+                if(Fy/Fe <= 2.25) {
+                    Fcr = Math.pow(0.658, Fy/Fe) * Fy; 
+                } else {
+                    Fcr = 0.877 * Fe;
+                }
+
+                // Loads
                 const w_trib = W / 2;
                 const DL_steel = w_steel * 1.1; 
                 const DL_stair = (SDL * w_trib); 
@@ -324,7 +433,11 @@
                 const w_LL_cm = LL_stringer / 100; 
                 const L_cm = L * 100; 
 
-                // --- 12x12 Matrix Stiffness Method Engine (replaces simplified static equations) ---
+                // Point Load calculations
+                const Pu_point = 1.6 * Point_L; // Factored point load
+                const Mu_point = (Pu_point * L) / 4; 
+                const Vu_point = Pu_point / 2;
+
                 const E_m = E_ksc * 10000; // kg/m2
                 const A_m = Area / 10000; // m2
                 const I_m = Ix / 100000000; // m4
@@ -393,7 +506,7 @@
                 let fixed_dofs = [];
                 if(support_type === 'fixed') fixed_dofs = [0, 1, 2, 9, 10, 11];
                 else if(support_type === 'pinned') fixed_dofs = [0, 1, 9, 10];
-                else if(support_type === 'fixed-roller') fixed_dofs = [0, 1, 2, 10]; // x(9) free, rot(11) free
+                else if(support_type === 'fixed-roller') fixed_dofs = [0, 1, 2, 10]; 
                 else if(support_type === 'pinned-roller') fixed_dofs = [0, 1, 10];
 
                 for(let i of fixed_dofs) {
@@ -437,15 +550,18 @@
                     F_end_glob.push(mul(trans(em.T), trans([F_loc_end])).map(r=>r[0]));
 
                     let num_steps = 100;
-                    let q_x = -w_m * em.s * em.c; // local axial load per unit length
-                    let q_y = -w_m * em.c * em.c; // local transverse load per unit length
+                    let q_x = -w_m * em.s * em.c; // local axial load
+                    let q_y = -w_m * em.c * em.c; // local transverse load
 
                     for(let i=0; i<=num_steps; i++) {
                         let x_loc = (i / num_steps) * em.Le;
                         let global_x = nodes[elements[idx].n1].x + x_loc * em.c;
+                        let global_y = nodes[elements[idx].n1].y + x_loc * em.s;
                         
                         let N = -F_loc_end[0] - q_x * x_loc;
                         let V = F_loc_end[1] + q_y * x_loc;
+                        
+                        // โมเมนต์ต้องคิดรวมพฤติกรรม Hx (Arching action) ซึ่ง Matrix Solver คิดให้แล้วใน F_loc_end
                         let M = -F_loc_end[2] + F_loc_end[1] * x_loc + q_y * x_loc * x_loc / 2;
                         
                         forceData.push({ x: global_x, AFD: N, SFD: V, BMD: M });
@@ -468,18 +584,26 @@
                 let denom_M = (support_type === 'pinned' || support_type === 'pinned-roller') ? 8 : 12;
                 let Mu_eq = (w_u * L * L) / denom_M;
                 let Vu_eq = (w_u * L) / 2;
-                let Pu_eq = Math.abs(Rx1) * Math.cos(theta_rad) + Math.abs(Ry1) * Math.sin(theta_rad);
+                let Pu_eq = Math.abs(Rx1) * Math.cos(theta_rad) + Math.abs(Ry1) * Math.sin(theta_rad); // Projected Force
                 
-                // Design Envelope (Conservative Approach)
+                // Design Envelope (Conservative Approach: max of DSM, EQ Beam, and Point Load)
                 let Pu = Math.max(Pu_dsm, Pu_eq);
-                let Vu = Math.max(Vu_dsm, Vu_eq);
-                let Mu = Math.max(Mu_dsm, Mu_eq);
+                let Vu = Math.max(Vu_dsm, Vu_eq, Vu_point);
+                let Mu = Math.max(Mu_dsm, Mu_eq, Mu_point);
 
                 let M_kink = Math.max(M_kink_arr[0] || 0, M_kink_arr[1] || 0);
 
                 const phi_b = 0.90; const phi_c = 0.90; const phi_v = 0.90;
-                const Pn = Fy * Area; const phi_Pn = phi_c * Pn; const ratio_axial = Pu / phi_Pn;
-                const Mn = Fy * Zx / 100; const phi_Mn = phi_b * Mn; const ratio_flexure = Mu / phi_Mn;
+                
+                // Compression (using Fcr instead of Fy directly)
+                const Pn = Fcr * Area; 
+                const phi_Pn = phi_c * Pn; 
+                const ratio_axial = Pu / phi_Pn;
+                
+                // Flexure (using Sx if non-compact)
+                const Mn = isCompact ? (Fy * Zx / 100) : (Fy * Sx / 100); 
+                const phi_Mn = phi_b * Mn; 
+                const ratio_flexure = Mu / phi_Mn;
 
                 let ratio_interaction = 0;
                 if (ratio_axial >= 0.2) {
@@ -489,7 +613,7 @@
                 }
 
                 const Aw = 2 * dc * tc;
-                const Vn = 0.6 * Fy * Aw * 1.0;
+                const Vn = 0.6 * Fy * Aw * 1.0; // Assuming Cv = 1.0 for standard RHS
                 const phi_Vn = phi_v * Vn;
                 const ratio_shear = Vu / phi_Vn;
                 const max_ratio = Math.max(ratio_interaction, ratio_shear);
@@ -503,20 +627,16 @@
                 const t_req_mm = (A_req_cm2 / (b_inner_mm / 10)) * 10; 
                 const t_st_rec = Math.ceil(Math.max(t_req_mm, t, 6)); 
 
-                // Serviceability - theoretical equivalent horizontal beam approximation
-                let delta_LL_max_cm = (support_type === 'pinned' || support_type === 'pinned-roller') 
-                    ? (5 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix)
-                    : (1 * w_LL_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix);
-                let delta_LL_max_mm = delta_LL_max_cm * 10; 
-
-                let w_active = DL_total + (0.1 * LL_stringer);
-                let w_active_cm = w_active / 100; 
-                let delta_active_cm = (support_type === 'pinned' || support_type === 'pinned-roller') 
-                    ? (5 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix)
-                    : (1 * w_active_cm * Math.pow(L_cm, 4)) / (384 * E_ksc * Ix);
-                let delta_active_mm = delta_active_cm * 10;
-                const fn = 17.76 / Math.sqrt(Math.max(delta_active_mm, 0.001));
+                // Serviceability (Deflection & Vibration)
+                // Use DSM vertical displacement (Node 1 & Node 2 which correspond to U[4] and U[7])
+                let delta_DSM_mm = Math.max(Math.abs(U[4]), Math.abs(U[7])) * 1000;
+                // Ratio it to just the Live Load portion for LL deflection check
+                let delta_LL_max_mm = delta_DSM_mm * (LL_stringer / w_u); 
                 const def_limit_mm = (L * 1000) / 400; 
+
+                // Active mass for vibration
+                let delta_active_mm = delta_DSM_mm * ((DL_total + 0.1 * LL_stringer) / w_u);
+                const fn = 17.76 / Math.sqrt(Math.max(delta_active_mm, 0.001));
 
                 document.getElementById('out_ratio').innerText = max_ratio.toFixed(2);
                 const b_ratio = document.getElementById('badge_ratio');
@@ -548,32 +668,76 @@
                     b_vib.innerText = '< 5Hz'; b_vib.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700';
                     t_vib.innerText = 'อาจเกิดการสั่นสะเทือนขณะเดิน';
                 }
+                
+                // Update Ergonomics UI
+                document.getElementById('out_riser').innerText = riser.toFixed(0);
+                document.getElementById('out_tread').innerText = tread.toFixed(0);
+                document.getElementById('out_ergo').innerText = ergRule.toFixed(0);
+                const b_ergo = document.getElementById('badge_ergo');
+                if(ergRule >= 600 && ergRule <= 650) {
+                    b_ergo.innerText = 'PASS'; b_ergo.className = 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700';
+                } else {
+                    b_ergo.innerText = 'FAIL'; b_ergo.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700';
+                }
 
                 const calcData = {
                     L, H, W, L_landing, L_flight, H_flight, riser, tread, ergRule, theta_rad, theta_deg,
-                    LL, SDL, Fy, E_ksc, d, b, t, Area, w_steel, Ix, Zx,
+                    LL, Point_L, SDL, Fy, E_ksc, d, b, t, Area, w_steel, Ix, Zx, Sx,
+                    isCompact, lambda_flange, lambda_web, lambda_p_f, lambda_p_w,
+                    KL_r, Fe, Fcr, Lb_m, K_factor, r_min,
                     w_trib, DL_steel, DL_stair, DL_total, LL_stringer, w_u, w_LL_cm, L_cm,
                     Mu, Vu, Pu, support_type,
                     Mu_eq, Vu_eq, Pu_eq, denom_M, Mu_dsm, Vu_dsm, Pu_dsm,
+                    Mu_point, Vu_point,
                     Rx1, Ry1, Mz1, Rx2, Ry2, Mz2,
                     phi_Pn, ratio_axial,
                     Mn, phi_Mn, ratio_flexure, ratio_interaction,
                     Vn, phi_Vn, ratio_shear, max_ratio,
                     M_kink, d_eff, Pf, Fr, b_inner_mm, A_req_cm2, t_req_mm, t_st_rec,
-                    delta_LL_max_cm, delta_LL_max_mm, def_limit_mm, fn, w_active_cm, delta_active_mm, delta_active_cm,
+                    delta_DSM_mm, delta_LL_max_mm, def_limit_mm, fn, delta_active_mm,
                     forceData, maxA, minA, maxS, minS, maxB, minB
                 };
 
-                drawElevation(calcData); drawPlan(calcData); drawStiffenerPlan(calcData);
-                drawFBD(calcData); drawTrueDiagrams(calcData); 
-                generateReport(calcData); generateNom(calcData);
+                // วาดกราฟิกทั้งหมดโดยใช้ Master Scale ร่วมกันเพื่อให้สัดส่วน Aspect Ratio ตรงกัน 100%
+                const masterScale = calculateMasterScale(calcData);
+                drawElevation(calcData, masterScale); 
+                drawPlan(calcData, masterScale); 
+                drawStiffenerPlan(calcData, masterScale);
+                
+                drawFBD(calcData); 
+                drawTrueDiagrams(calcData); 
+                generateReport(calcData); 
+                generateNom(calcData);
 
             } catch (e) {
                 console.error("Calculation Error:", e);
+                showBanner('เกิดข้อผิดพลาดในการคำนวณ (อาจเกิดจากสมการหารด้วยศูนย์) โปรดตรวจสอบตัวเลขนำเข้า', 'error');
             }
         }
 
-        function drawElevation(data) {
+        function calculateMasterScale(data) {
+            // ดึงขนาดของ container ของรูปด้านและรูปแปลน
+            const cElev = document.getElementById('canvasElevation').parentElement;
+            const cPlan = document.getElementById('canvasPlan').parentElement;
+            if(!cElev || !cPlan || cElev.clientWidth === 0) return 1;
+
+            const marginX = 50; const marginY = 50;
+            
+            // หา Scale จากพื้นที่รูปด้าน (ใช้กว้าง L, สูง H)
+            const scaleX_elev = (cElev.clientWidth - 2 * marginX) / data.L;
+            const scaleY_elev = (cElev.clientHeight - 2 * marginY) / data.H;
+            const scale_elev = Math.min(scaleX_elev, scaleY_elev);
+
+            // หา Scale จากพื้นที่แปลน (ใช้กว้าง L, ลึก W)
+            const scaleX_plan = (cPlan.clientWidth - 2 * marginX) / data.L;
+            const scaleY_plan = (cPlan.clientHeight - 2 * marginY) / data.W;
+            const scale_plan = Math.min(scaleX_plan, scaleY_plan);
+
+            // เลือก Scale ที่เล็กที่สุดเป็น Master Scale เพื่อให้ทุกรูปวาดแล้วพอดีกับกล่องและมีสัดส่วนเป๊ะ
+            return Math.min(scale_elev, scale_plan) * 0.9; 
+        }
+
+        function drawElevation(data, scale) {
             const canvas = document.getElementById('canvasElevation');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth;
@@ -582,9 +746,6 @@
             canvas.width = cw; canvas.height = ch;
             ctx.clearRect(0, 0, cw, ch);
             
-            const margin = 50; const drawW = cw - 2*margin; const drawH = ch - 2*margin;
-            const scaleX = drawW / data.L; const scaleY = drawH / data.H;
-            const scale = Math.min(scaleX, scaleY) * 0.8;
             const cx = cw/2; const cy = ch/2;
             const mapPt = (x, y) => ({ x: cx + (x - data.L/2) * scale, y: cy - (y - data.H/2) * scale });
 
@@ -608,24 +769,19 @@
             ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.fillStyle = '#475569'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
             const dimY = Math.max(p0.y, p3.y) + 40;
             ctx.beginPath(); ctx.moveTo(p0.x, p0.y + 10); ctx.lineTo(p0.x, dimY + 5); ctx.moveTo(p3.x, p3.y + 10); ctx.lineTo(p3.x, dimY + 5); ctx.moveTo(p0.x, dimY); ctx.lineTo(p3.x, dimY); ctx.stroke();
-            ctx.fillText(`L = ${data.L} m`, cx, dimY - 5);
+            ctx.fillText(`L = ${data.L.toFixed(2)} m`, cx, dimY - 5);
             
             const dimX = Math.min(p0.x, p3.x) - 40;
             ctx.beginPath(); ctx.moveTo(p0.x - 10, p0.y); ctx.lineTo(dimX - 5, p0.y); ctx.moveTo(p3.x - 10, p3.y); ctx.lineTo(dimX - 5, p3.y); ctx.moveTo(dimX, p0.y); ctx.lineTo(dimX, p3.y); ctx.stroke();
-            ctx.save(); ctx.translate(dimX - 5, cy); ctx.rotate(-Math.PI/2); ctx.fillText(`H = ${data.H} m`, 0, 0); ctx.restore();
+            ctx.save(); ctx.translate(dimX - 5, cy); ctx.rotate(-Math.PI/2); ctx.fillText(`H = ${data.H.toFixed(2)} m`, 0, 0); ctx.restore();
         }
 
-        function drawPlan(data) {
+        function drawPlan(data, scale) {
             const canvas = document.getElementById('canvasPlan');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
-            
-            const marginX = 40; const marginY = 30; 
-            const scaleX = (cw - 2 * marginX) / data.L;
-            const scaleY = (ch - 2 * marginY) / data.W;
-            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
             
             const stairW_px = data.W * scale;
             const cx = cw/2; const cy = ch/2;
@@ -650,17 +806,12 @@
             ctx.setLineDash([]);
         }
 
-        function drawStiffenerPlan(data) {
+        function drawStiffenerPlan(data, scale) {
             const canvas = document.getElementById('canvasStiffenerPlan');
             const ctx = canvas.getContext('2d');
             const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
             if (cw === 0 || ch === 0) return;
             canvas.width = cw; canvas.height = ch; ctx.clearRect(0, 0, cw, ch);
-
-            const marginX = 40; const marginY = 40;
-            const scaleX = (cw - 2 * marginX) / data.L;
-            const scaleY = (ch - 2 * marginY) / data.W;
-            const scale = Math.min(scaleX, scaleY); // บังคับสัดส่วนให้พอดีจอทั้งกว้างและสูง
 
             const stairW_px = data.W * scale;
             const cx = cw/2; const cy = ch/2 - 15; const startX = cx - (data.L * scale)/2;
@@ -744,24 +895,24 @@
             if (ry1_val > 0.1) {
                 let dir = data.Ry1 > 0 ? 1 : -1;
                 drawFBDArrow(ctx, p0.x, p0.y + 40*dir, p0.x, p0.y + 10*dir);
-                ctx.textAlign = 'center'; ctx.fillText(`Ry1 = ${fmt(ry1_val,0)}`, p0.x, p0.y + 55*dir);
+                ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(ry1_val,0)}`, p0.x, p0.y + 55*dir);
             }
             let rx1_val = Math.abs(data.Rx1);
             if (rx1_val > 0.1) {
                 if (data.Rx1 > 0) drawFBDArrow(ctx, p0.x - 40, p0.y, p0.x - 10, p0.y); // +x -> Right
                 else drawFBDArrow(ctx, p0.x - 10, p0.y, p0.x - 40, p0.y); // -x -> Left
-                ctx.textAlign = 'right'; ctx.fillText(`Rx1 = ${fmt(rx1_val,0)}`, p0.x - 45, p0.y + 4);
+                ctx.textAlign = 'right'; ctx.fillText(`Hx = ${fmt(rx1_val,0)}`, p0.x - 45, p0.y + 4);
             } else {
                 ctx.beginPath(); ctx.arc(p0.x - 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(p0.x + 6, p0.y + 6, 4, 0, Math.PI*2); ctx.stroke();
-                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.fillText(`Rx1 = 0`, p0.x - 20, p0.y + 4); ctx.fillStyle = '#ef4444';
+                ctx.textAlign = 'right'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p0.x - 20, p0.y + 4); ctx.fillStyle = '#ef4444';
             }
             let mz1_val = Math.abs(data.Mz1);
             if(mz1_val > 0.1) {
                 let dir = data.Mz1 > 0 ? 1 : -1; // + is CCW
                 ctx.beginPath(); ctx.arc(p0.x, p0.y, 25, 0.5*Math.PI, 1.5*Math.PI); ctx.stroke();
                 drawFBDArrowHead(ctx, p0.x, p0.y - 25, dir > 0 ? 0 : Math.PI);
-                ctx.fillText(`Mz1 = ${fmt(mz1_val,0)}`, p0.x - 30, p0.y - 25);
+                ctx.fillText(`Mz = ${fmt(mz1_val,0)}`, p0.x - 30, p0.y - 25);
             }
 
             // Right Support (Node 3)
@@ -769,24 +920,24 @@
             if (ry2_val > 0.1) {
                 let dir = data.Ry2 > 0 ? 1 : -1;
                 drawFBDArrow(ctx, p3.x, p3.y + 40*dir, p3.x, p3.y + 10*dir);
-                ctx.textAlign = 'center'; ctx.fillText(`Ry2 = ${fmt(ry2_val,0)}`, p3.x, p3.y + 55*dir);
+                ctx.textAlign = 'center'; ctx.fillText(`Ry = ${fmt(ry2_val,0)}`, p3.x, p3.y + 55*dir);
             }
             let rx2_val = Math.abs(data.Rx2);
             if (rx2_val > 0.1) {
                 if (data.Rx2 > 0) drawFBDArrow(ctx, p3.x + 10, p3.y, p3.x + 40, p3.y); // +x -> Right
                 else drawFBDArrow(ctx, p3.x + 40, p3.y, p3.x + 10, p3.y); // -x -> Left
-                ctx.textAlign = 'left'; ctx.fillText(`Rx2 = ${fmt(rx2_val,0)}`, p3.x + 45, p3.y + 4);
+                ctx.textAlign = 'left'; ctx.fillText(`Hx = ${fmt(rx2_val,0)}`, p3.x + 45, p3.y + 4);
             } else {
                 ctx.beginPath(); ctx.arc(p3.x - 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(p3.x + 6, p3.y + 6, 4, 0, Math.PI*2); ctx.stroke();
-                ctx.textAlign = 'left'; ctx.fillStyle = '#64748b'; ctx.fillText(`Rx2 = 0`, p3.x + 20, p3.y + 4); ctx.fillStyle = '#ef4444';
+                ctx.textAlign = 'left'; ctx.fillStyle = '#64748b'; ctx.fillText(`Hx = 0`, p3.x + 20, p3.y + 4); ctx.fillStyle = '#ef4444';
             }
             let mz2_val = Math.abs(data.Mz2);
             if(mz2_val > 0.1) {
                 let dir = data.Mz2 > 0 ? 1 : -1; // + is CCW
                 ctx.beginPath(); ctx.arc(p3.x, p3.y, 25, 1.5*Math.PI, 0.5*Math.PI); ctx.stroke();
                 drawFBDArrowHead(ctx, p3.x, p3.y - 25, dir > 0 ? Math.PI : 0);
-                ctx.fillText(`Mz2 = ${fmt(mz2_val,0)}`, p3.x + 30, p3.y - 25);
+                ctx.fillText(`Mz = ${fmt(mz2_val,0)}`, p3.x + 30, p3.y - 25);
             }
         }
         function drawFBDArrow(ctx, fromX, fromY, toX, toY) {
@@ -807,7 +958,7 @@
                 return { x, y, angle };
             };
 
-            const drawGraph = (canvasId, type, maxVal, minVal, unit) => {
+            const drawGraph = (canvasId, type, maxVal, minVal, designVal) => {
                 const canvas = document.getElementById(canvasId);
                 const ctx = canvas.getContext('2d');
                 const cw = canvas.parentElement.clientWidth; const ch = canvas.parentElement.clientHeight;
@@ -825,7 +976,7 @@
                 const p2 = mapToCanvas(data.L_flight + data.L_landing, data.H_flight); const p3 = mapToCanvas(data.L, data.H);
                 ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
 
-                const absMax = Math.max(Math.abs(maxVal), Math.abs(minVal), 0.001);
+                const absMax = Math.max(Math.abs(maxVal), Math.abs(minVal), Math.abs(designVal), 0.001);
                 const valScale = 45 / absMax; 
                 let plotPoints = []; let baselinePoints = [];
 
@@ -867,49 +1018,39 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
-                // กำหนด Index ที่จะแสดงตัวเลข: โคนบันได, กลางทางขึ้น, จุดหักมุม 1, กลางชานพัก, จุดหักมุม 2, กลางทางขึ้น 2, ปลายบันได
-                const labelIndices = [0, 50, 100, 150, 200, 250, 300];
+                const labelIndices = [0, 50, 100, 150, 200, 250, 300]; // 100 steps total, multiply by 3 elements = 300
                 
                 labelIndices.forEach(idx => {
                     if(idx < data.forceData.length) {
                         const dpt = data.forceData[idx];
                         const path = getPath(dpt.x);
                         
-                        // แปลงหน่วยเป็นตัน (ton) และทศนิยม 3 ตำแหน่ง
                         const valInTons = (dpt[type] / 1000).toFixed(3); 
-                        
                         const basePt = baselinePoints[idx];
                         const plotPt = plotPoints[idx];
 
-                        // คำนวณระยะเยื้อง (Offset) ให้ออกห่างจากเส้นกราฟเล็กน้อย
                         let dx = plotPt.x - basePt.x;
                         let dy = plotPt.y - basePt.y;
                         let len = Math.hypot(dx, dy);
                         
-                        // ถ้าค่าแรงเข้าใกล้ 0 กราฟจะแบน ให้จับยืดออกไปเองตามทิศทางตั้งฉาก
                         if (len < 1) { 
                             dx = 12 * Math.sin(path.angle);
                             dy = 12 * Math.cos(path.angle);
                         } else {
-                            // ยืดระยะออกไปจากขอบกราฟอีก 10 px
                             dx = (dx / len) * (len + 10);
                             dy = (dy / len) * (len + 10);
                         }
 
-                        // ถ้ากราฟอยู่ด้านล่างเส้น ให้สลับตำแหน่งตัวหนังสือมาไว้อีกฝั่งเพื่อไม่ให้อ่านยาก
                         if (type === 'BMD' && dpt[type] > 0) { dy += 15; dx -= 5; }
 
                         ctx.save();
                         ctx.translate(basePt.x + dx, basePt.y + dy);
-                        // หมุนตัวหนังสือให้ขนานกับความเอียงของบันได (canvas Y ทิศลง จึงต้องเป็นมุมลบ)
                         ctx.rotate(-path.angle);
                         
-                        // ใส่ขอบสีขาวให้ตัวหนังสืออ่านง่ายเมื่อทับเส้น
                         ctx.strokeStyle = 'white';
                         ctx.lineWidth = 3;
                         ctx.strokeText(valInTons, 0, 0);
                         
-                        // เติมสีตัวหนังสือ
                         ctx.fillStyle = (type === 'BMD') ? '#991b1b' : (type === 'SFD' ? '#1e3a8a' : '#475569');
                         ctx.fillText(valInTons, 0, 0);
                         
@@ -917,16 +1058,28 @@
                     }
                 });
 
-                // แสดงค่า Max/Min ที่มุมจอ ปรับหน่วยเป็น Ton
                 ctx.fillStyle = '#1e293b'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
                 let unitTon = (type === 'BMD') ? 'ton-m' : 'ton';
-                if(Math.abs(maxVal) > 0.001) ctx.fillText(`Max: ${(maxVal/1000).toFixed(3)} ${unitTon}`, 20, 25);
-                if(Math.abs(minVal) > 0.001) ctx.fillText(`Min: ${(minVal/1000).toFixed(3)} ${unitTon}`, 20, ch - 15);
+                if(Math.abs(maxVal) > 0.001) ctx.fillText(`Max (DSM): ${(maxVal/1000).toFixed(3)} ${unitTon}`, 20, 25);
+                if(Math.abs(minVal) > 0.001) ctx.fillText(`Min (DSM): ${(minVal/1000).toFixed(3)} ${unitTon}`, 20, ch - 15);
+
+                // Add Dashed line for Envelope Design Value
+                if (type !== 'AFD') {
+                    ctx.setLineDash([4,4]);
+                    ctx.strokeStyle = '#059669'; // Green line for design envelope
+                    ctx.lineWidth = 1;
+                    const designValTon = designVal / 1000;
+                    const h_design = ch - 40; 
+                    ctx.beginPath(); ctx.moveTo(cw - 180, 25); ctx.lineTo(cw - 20, 25); ctx.stroke();
+                    ctx.fillStyle = '#059669'; ctx.textAlign = 'right';
+                    ctx.fillText(`Design Env: ${designValTon.toFixed(3)} ${unitTon}`, cw - 20, 15);
+                    ctx.setLineDash([]);
+                }
             };
             
-            drawGraph('canvasAFD', 'AFD', data.maxA, data.minA, 'kg');
-            drawGraph('canvasSFD', 'SFD', data.maxS, data.minS, 'kg');
-            drawGraph('canvasBMD', 'BMD', data.maxB, data.minB, 'kg-m');
+            drawGraph('canvasAFD', 'AFD', data.maxA, data.minA, data.Pu);
+            drawGraph('canvasSFD', 'SFD', data.maxS, data.minS, data.Vu);
+            drawGraph('canvasBMD', 'BMD', data.maxB, data.minB, data.Mu);
         }
 
         function generateReport(data) {
@@ -942,7 +1095,8 @@
                         <tr><td>ระยะพาดตามแนวราบ (Span), $ L $</td><td>${data.L.toFixed(2)} m</td><td>ความกว้างบันได, $ W $</td><td>${data.W.toFixed(2)} m</td></tr>
                         <tr><td>ความสูงระหว่างชั้น, $ H $</td><td>${data.H.toFixed(2)} m</td><td>ความยาวชานพัก</td><td>${data.L_landing.toFixed(2)} m</td></tr>
                         <tr><td>มุมเอียงบันได (Inclination), $ \\theta $</td><td colspan="3">${data.theta_deg.toFixed(2)}^\\circ</td></tr>
-                        <tr><td>น้ำหนักบรรทุกจร (Live Load)</td><td>${data.LL} kg/m²</td><td>น้ำหนักตกแต่ง (SDL)</td><td>${data.SDL} kg/m²</td></tr>
+                        <tr><td>น้ำหนักบรรทุกจร (Uniform LL)</td><td>${data.LL} kg/m²</td><td>น้ำหนักวัสดุตกแต่ง (SDL)</td><td>${data.SDL} kg/m²</td></tr>
+                        <tr><td>น้ำหนักบรรทุกจรแบบจุด (Point LL)</td><td>${data.Point_L} kg</td><td>ระยะไร้ค้ำยัน (Unbraced L)</td><td>${data.Lb_m.toFixed(2)} m</td></tr>
                     </table>
                 </div>
 
@@ -957,74 +1111,74 @@
                                 <text x="100" y="8" font-size="10" text-anchor="middle" fill="#475569">b = ${data.b} mm</text>
                                 <line x1="35" y1="20" x2="35" y2="180" stroke="#64748b" stroke-width="1"/>
                                 <text x="32" y="100" font-size="10" text-anchor="middle" fill="#475569" transform="rotate(-90 32,100)">d = ${data.d} mm</text>
-                                <text x="100" y="100" font-size="10" text-anchor="middle" fill="#1e3a8a">t = ${data.t} mm</text>
+                                <text x="100" y="100" font-size="10" text-anchor="middle" fill="#1e3a8a">t = ${data.t.toFixed(1)} mm</text>
                             </svg>
-                            <p class="font-bold mt-2 text-sm text-gray-700">RHS / BOX ${data.d}x${data.b}x${data.t}</p>
+                            <p class="font-bold mt-2 text-sm text-gray-700">RHS / BOX ${data.d}x${data.b}x${data.t.toFixed(1)}</p>
                         </div>
-                        <div class="w-2/3">
-                            <p class="mb-2"><strong>พื้นที่หน้าตัด (Area), $ A $:</strong></p>
-                            <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                                $$ A = (d \\times b) - (d_{in} \\times b_{in}) = ${data.Area.toFixed(2)} \\text{ cm}^2 $$
-                            </div>
-                            <p class="mb-2 mt-4"><strong>พลาสติกมอดูลัส (Plastic Modulus), $ Z_x $:</strong></p>
-                            <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                                $$ Z_x = \\frac{b d^2}{4} - \\frac{b_{in} d_{in}^2}{4} = ${fmt(data.Zx, 2)} \\text{ cm}^3 $$
+                        <div class="w-2/3 text-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="mb-1"><strong>พื้นที่หน้าตัด (Area), $ A $:</strong></p>
+                                    <div class="mb-3 pl-3 border-l-2 border-gray-200">$$ A = ${data.Area.toFixed(2)} \\text{ cm}^2 $$</div>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>รัศมีไจเรชัน ($ r_x , r_y $):</strong></p>
+                                    <div class="mb-3 pl-3 border-l-2 border-gray-200">
+                                        $$ r_x = ${data.r_min.toFixed(2)} \\text{ cm} $$ (ค่าน้อยสุด)
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>พลาสติกมอดูลัส, $ Z_x $:</strong></p>
+                                    <div class="mb-3 pl-3 border-l-2 border-gray-200">$$ Z_x = ${fmt(data.Zx, 2)} \\text{ cm}^3 $$</div>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>อิลาสติกมอดูลัส, $ S_x $:</strong></p>
+                                    <div class="mb-3 pl-3 border-l-2 border-gray-200">$$ S_x = ${fmt(data.Sx, 2)} \\text{ cm}^3 $$</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="report-section">
-                    <h3>3. การประเมินน้ำหนักบรรทุกและแรงออกแบบประลัย <span class="ref-text">[อ้างอิง: ASCE 7-16 Section 2.3.1]</span></h3>
-                    
-                    <p class="mb-2 mt-3"><strong>3.1 การกระจายน้ำหนักลงแม่บันได 1 ข้าง (Tributary Loads)</strong></p>
-                    <p class="text-sm text-gray-700 mb-2">แม่บันได 1 ข้างจะรับน้ำหนักครึ่งหนึ่งของความกว้างบันไดทั้งหมด (Tributary Width, $ W_{trib} = W / 2 = ${fmt(data.W,2)} / 2 = ${fmt(data.w_trib,2)} \\text{ m} $)</p>
+                    <h3>3. การประเมินแรงออกแบบประลัยสูงสุด (Design Force Envelope)</h3>
                     
                     <div class="ml-4 mb-4 bg-gray-50 p-4 rounded border border-gray-200">
-                        <p class="font-bold text-sm text-gray-800 mb-1">น้ำหนักคงที่ (Dead Load, DL):</p>
+                        <p class="font-bold text-sm text-gray-800 mb-1">3.1 น้ำหนักประลัยกระจาย (Uniform Factored Load, $ w_u $)</p>
                         <ul class="text-sm text-gray-600 list-disc ml-5 mb-2">
-                            <li>น้ำหนักเหล็ก (รวมเผื่อรอยเชื่อม 10%): $ ${fmt(data.w_steel,2)} \\times 1.1 = ${fmt(data.DL_steel, 2)} \\text{ kg/m} $</li>
-                            <li>น้ำหนักวัสดุตกแต่ง (SDL): $ ${data.SDL} \\text{ kg/m}^2 \\times ${fmt(data.w_trib,2)} \\text{ m} = ${fmt(data.DL_stair, 2)} \\text{ kg/m} $</li>
+                            <li>น้ำหนักคงที่แม่บันได ($ DL = ${fmt(data.DL_total, 2)} \\text{ kg/m} $)</li>
+                            <li>น้ำหนักจรบนบันได ($ LL = ${fmt(data.LL_stringer, 2)} \\text{ kg/m} $)</li>
                         </ul>
-                        <p class="text-sm mt-1">รวมน้ำหนักคงที่ ($ w_{DL} $) $ = ${fmt(data.DL_steel, 2)} + ${fmt(data.DL_stair, 2)} = \\mathbf{${fmt(data.DL_total, 2)} \\text{ kg/m}} $</p>
-                        
-                        <p class="font-bold text-sm text-gray-800 mt-3 mb-1">น้ำหนักจร (Live Load, LL):</p>
-                        <ul class="text-sm text-gray-600 list-disc ml-5 mb-2">
-                            <li>น้ำหนักจรบนบันได: $ ${data.LL} \\text{ kg/m}^2 \\times ${fmt(data.w_trib,2)} \\text{ m} = \\mathbf{${fmt(data.LL_stringer, 2)} \\text{ kg/m}} $</li>
-                        </ul>
-                        <div class="text-xs text-blue-700 italic bg-blue-50 p-2 rounded mt-2">
-                            * หมายเหตุสำหรับการคำนวณระยะโก่งตัว: น้ำหนัก $ w_{LL} = ${fmt(data.LL_stringer, 2)} \\text{ kg/m} $ จะถูกแปลงหน่วยโดยหารด้วย 100 เท่ากับ <strong>$ ${fmt(data.w_LL_cm, 2)} \text{ kg/cm} $</strong>
+                        <div class="mt-2 mb-2 pl-4 border-l-2 border-gray-200 text-sm">
+                            $$ w_u = 1.2(DL) + 1.6(LL) = 1.2(${fmt(data.DL_total, 2)}) + 1.6(${fmt(data.LL_stringer, 2)}) = \\mathbf{${fmt(data.w_u, 2)} \\text{ kg/m}} $$
                         </div>
                     </div>
 
-                    <p class="mb-2 mt-4"><strong>3.2 น้ำหนักประลัยกระจายสม่ำเสมอ ($ w_u $)</strong></p>
-                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                        $$ w_u = 1.2(DL) + 1.6(LL) = 1.2(${fmt(data.DL_total, 2)}) + 1.6(${fmt(data.LL_stringer, 2)}) = \\mathbf{${fmt(data.w_u, 2)} \\text{ kg/m}} $$
-                    </div>
-                    
                     <div class="mt-4 mb-4 bg-gray-50 p-4 rounded border border-gray-200">
-                        <p class="font-bold text-gray-800 mb-2">3.3 แรงออกแบบประลัยสูงสุด (Design Force Envelope)</p>
+                        <p class="font-bold text-gray-800 mb-2">3.2 แรงออกแบบประลัยสูงสุด (Design Force Envelope)</p>
                         
                         <div class="bg-blue-50 border border-blue-100 p-3 mb-4 text-sm text-blue-800 rounded-lg">
-                            <strong>วิธีกำหนดค่าออกแบบ (Design Approach):</strong> เพื่อความปลอดภัยสูงสุดและให้วิศวกรสามารถตรวจสอบด้วยมือได้ง่าย โปรแกรมจะคำนวณแรงด้วย <strong>"สมการคานราบเทียบเท่า (Equivalent Beam)"</strong> มาเทียบกับ <strong>"โมเดลโครงสร้างจริง 3 มิติ (DSM Matrix)"</strong> และเลือก <strong>ค่าที่สูงกว่า (Envelope)</strong> ไปใช้ในการออกแบบ
+                            <strong>วิธีกำหนดค่าออกแบบ (Design Approach):</strong> เพื่อความปลอดภัยสูงสุด โปรแกรมจะคำนวณแรงด้วย <strong>"สมการคานราบเทียบเท่า (Equivalent Beam)"</strong> และ <strong>"น้ำหนักกระทำแบบจุด (Point Load)"</strong> มาเทียบกับ <strong>"โมเดลโครงสร้างจริง 3 มิติ (DSM Matrix)"</strong> และเลือก <strong>ค่าที่สูงกว่า (Envelope)</strong> ไปใช้ในการออกแบบ
                         </div>
 
                         <p class="text-sm text-gray-700 font-semibold mb-1">1) โมเมนต์ดัดสูงสุด ($M_u$):</p>
                         <div class="ml-4 text-sm text-gray-600 mb-2">
-                            <p>• จากคานราบเทียบเท่า (สมการ $w_u L^2 / ${data.denom_M}): $$ M_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}^2}{${data.denom_M}} = ${fmt(data.Mu_eq, 2)} \\text{ kg-m} $$</p>
+                            <p>• จากคานราบเทียบเท่า ($ w_u L^2 / ${data.denom_M} $): $$ M_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}^2}{${data.denom_M}} = ${fmt(data.Mu_eq, 2)} \\text{ kg-m} $$</p>
+                            <p>• จากน้ำหนักกระทำแบบจุด ($ 1.6P_L \\times L/4 $): $$ M_{point} = ${fmt(data.Mu_point, 2)} \\text{ kg-m} $$</p>
                             <p>• จากโมเดลจริง (DSM Matrix): $$ M_{dsm} = \\max(|M_{local}|) = ${fmt(data.Mu_dsm, 2)} \\text{ kg-m} $$</p>
                         </div>
                         <div class="mt-2 mb-4 pl-4 border-l-2 border-blue-200 text-blue-900">
-                            $$ M_u = \\max(M_{eq}, M_{dsm}) = \\mathbf{${fmt(data.Mu, 2)} \\text{ kg-m}} $$
+                            $$ M_u = \\max(M_{eq}, M_{point}, M_{dsm}) = \\mathbf{${fmt(data.Mu, 2)} \\text{ kg-m}} $$
                         </div>
 
                         <p class="text-sm text-gray-700 font-semibold mb-1 mt-4">2) แรงเฉือนสูงสุด ($V_u$):</p>
                         <div class="ml-4 text-sm text-gray-600 mb-2">
-                            <p>• จากคานราบเทียบเท่า (สมการ $w_u L / 2$): $$ V_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}}{2} = ${fmt(data.Vu_eq, 2)} \\text{ kg} $$</p>
+                            <p>• จากคานราบเทียบเท่า ($ w_u L / 2 $): $$ V_{eq} = \\frac{${fmt(data.w_u, 2)} \\times ${fmt(data.L, 2)}}{2} = ${fmt(data.Vu_eq, 2)} \\text{ kg} $$</p>
+                            <p>• จากน้ำหนักกระทำแบบจุด ($ 1.6P_L / 2 $): $$ V_{point} = ${fmt(data.Vu_point, 2)} \\text{ kg} $$</p>
                             <p>• จากโมเดลจริง (DSM Matrix Local Shear): $$ V_{dsm} = \\max(|V_{local}|) = ${fmt(data.Vu_dsm, 2)} \\text{ kg} $$</p>
                         </div>
                         <div class="mt-2 mb-4 pl-4 border-l-2 border-blue-200 text-blue-900">
-                            $$ V_u = \\max(V_{eq}, V_{dsm}) = \\mathbf{${fmt(data.Vu, 2)} \\text{ kg}} $$
+                            $$ V_u = \\max(V_{eq}, V_{point}, V_{dsm}) = \\mathbf{${fmt(data.Vu, 2)} \\text{ kg}} $$
                         </div>
 
                         <p class="text-sm text-gray-700 font-semibold mb-1 mt-4">3) แรงอัดตามแนวแกนสูงสุด ($P_u$):</p>
@@ -1041,27 +1195,30 @@
                 </div>
 
                 <div class="report-section">
-                    <h3>4. ตรวจสอบกำลังรับน้ำหนัก (Combined Axial & Bending Interaction)</h3>
+                    <h3>4. ตรวจสอบกำลังรับน้ำหนักของหน้าตัด (Section Strength Checks)</h3>
                     
-                    <p class="mb-2"><strong>4.1 กำลังรับแรงอัดประลัย (Axial Compressive Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section E3, Eq. E3-1]</span></p>
-                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                        $$ \\phi_c P_n = 0.90 (F_y \\cdot A) = 0.90 (${fmt(data.Fy,0)} \\times ${fmt(data.Area,2)}) = ${fmt(data.phi_Pn, 2)} \\text{ kg} $$
+                    <p class="mb-2"><strong>4.1 กำลังรับแรงอัดประลัย (Column Buckling Check)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Chapter E]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200 text-sm">
+                        <p>ตรวจสอบอัตราส่วนความชะลูด ($ KL/r $) โดยใช้ $ K = ${data.K_factor.toFixed(2)}, $ L_b = ${data.Lb_m.toFixed(2)} \\text{ m} $</p>
+                        $$ \\frac{KL}{r_{min}} = \\frac{${data.K_factor.toFixed(2)} \\times ${(data.Lb_m*100).toFixed(0)}}{${data.r_min.toFixed(2)}} = ${data.KL_r.toFixed(2)} $$
+                        <p>คำนวณ Elastic Buckling Stress ($ F_e $):</p>
+                        $$ F_e = \\frac{\\pi^2 E}{(KL/r)^2} = \\frac{\\pi^2 (2,040,000)}{${data.KL_r.toFixed(2)}^2} = ${fmt(data.Fe, 0)} \\text{ ksc} $$
+                        <p>เนื่องจาก $ F_y / F_e $ ${data.Fy/data.Fe <= 2.25 ? '\\le' : '>'} 2.25 จึงใช้สมการ AISC ${data.Fy/data.Fe <= 2.25 ? 'E3-2' : 'E3-3'}</p>
+                        $$ F_{cr} = ${fmt(data.Fcr, 0)} \\text{ ksc} \\rightarrow \\phi_c P_n = 0.90 (F_{cr} A_g) = 0.90 (${fmt(data.Fcr,0)} \\times ${fmt(data.Area,2)}) = ${fmt(data.phi_Pn, 2)} \\text{ kg} $$
                         $$ \\text{Ratio}_{axial} = \\frac{P_u}{\\phi_c P_n} = \\frac{${fmt(data.Pu,2)}}{${fmt(data.phi_Pn,2)}} = ${data.ratio_axial.toFixed(3)} $$
                     </div>
 
-                    <p class="mb-2 mt-4"><strong>4.2 กำลังรับโมเมนต์ดัดประลัย (Flexural Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section F7.1, Eq. F7-1]</span></p>
-                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                        $$ \\phi_b M_n = 0.90 (F_y \\cdot Z_x) = 0.90 \\times (${fmt(data.Fy,0)} \\times ${fmt(data.Zx,2)}) / 100 = ${fmt(data.phi_Mn, 2)} \\text{ kg-m} $$
+                    <p class="mb-2 mt-4"><strong>4.2 กำลังรับโมเมนต์ดัดประลัย (Local Buckling & Flexure)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Chapter F]</span></p>
+                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200 text-sm">
+                        <p>ตรวจสอบความชะลูดหน้าตัด (Compactness):</p>
+                        $$ \\lambda_{flange} = \\frac{b}{t} = ${data.lambda_flange.toFixed(1)} \\quad [\\text{Limit: } \\lambda_p = 1.12\\sqrt{E/F_y} = ${data.lambda_p_f.toFixed(1)}] $$
+                        $$ \\lambda_{web} = \\frac{h}{t_w} = ${data.lambda_web.toFixed(1)} \\quad [\\text{Limit: } \\lambda_p = 2.42\\sqrt{E/F_y} = ${data.lambda_p_w.toFixed(1)}] $$
+                        <p>หน้าตัดเป็นแบบ: <strong>${data.isCompact ? 'Compact Section (ใช้ Zx)' : 'Non-compact Section (ใช้ Sx)'}</strong></p>
+                        $$ \\phi_b M_n = 0.90 (F_y \\cdot ${data.isCompact ? 'Z_x' : 'S_x'}) = 0.90 \\times (${fmt(data.Fy,0)} \\times ${data.isCompact ? fmt(data.Zx,2) : fmt(data.Sx,2)}) / 100 = ${fmt(data.phi_Mn, 2)} \\text{ kg-m} $$
                         $$ \\text{Ratio}_{flexure} = \\frac{M_u}{\\phi_b M_n} = \\frac{${fmt(data.Mu,2)}}{${fmt(data.phi_Mn,2)}} = ${data.ratio_flexure.toFixed(3)} $$
                     </div>
 
-                    <p class="mb-2 mt-4"><strong>4.3 กำลังรับแรงเฉือนประลัย (Shear Strength)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section G4, Eq. G4-1]</span></p>
-                    <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                        $$ \\phi_v V_n = 0.90 (0.6 F_y A_w) = 0.90 (0.6 \\times ${fmt(data.Fy,0)} \\times ${fmt(2*data.d/10*data.t/10,2)}) = ${fmt(data.phi_Vn, 2)} \\text{ kg} $$
-                        $$ \\text{Ratio}_{shear} = \\frac{V_u}{\\phi_v V_n} = \\frac{${fmt(data.Vu,2)}}{${fmt(data.phi_Vn,2)}} = \\textcolor{${data.ratio_shear <= 1 ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.ratio_shear.toFixed(3)} \\quad ${data.ratio_shear <= 1 ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
-                    </div>
-
-                    <p class="mb-2 mt-4"><strong>4.4 สมการร่วม (Interaction Equation)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section H1.1, Eq. H1-1a/b]</span></p>
+                    <p class="mb-2 mt-4"><strong>4.3 สมการอัดร่วมดัด (Interaction Equation)</strong> <span class="ref-text">[อ้างอิง: AISC 360-16 Section H1.1, Eq. H1-1a/b]</span></p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
                         <p>เนื่องจาก $ \\frac{P_u}{\\phi_c P_n} $ ${data.ratio_axial >= 0.2 ? '\\ge 0.2' : '< 0.2'} จึงใช้สมการ:</p>
                         ${data.ratio_axial >= 0.2 
@@ -1073,50 +1230,24 @@
                 </div>
 
                 <div class="report-section bg-orange-50 border border-orange-200 p-6 rounded-xl">
-                    <h3 class="text-orange-800 border-orange-200">5. แรงเค้นเฉพาะจุดและการออกแบบจุดหักมุม (Kink Point) <span class="ref-text" style="color: #c2410c;">[อ้างอิง: AISC 360-16 Section J10.2]</span></h3>
-                    <p class="mb-3 text-gray-700">ณ ตำแหน่งรอยต่อระหว่างบันไดช่วงเอียงและชานพัก แรงดึงและแรงอัดในปีกคานจะทำให้เกิดแรงลัพธ์ในแนวฉาก (Radial Force) จึงต้องเชื่อมแผ่นดาม (Stiffener Plate)</p>
+                    <h3 class="text-orange-800 border-orange-200">5. แรงเค้นเฉพาะจุดและการออกแบบแผ่นดาม (Stiffener Plate) <span class="ref-text" style="color: #c2410c;">[อ้างอิง: AISC 360-16 Section J10.2]</span></h3>
+                    <p class="mb-3 text-gray-700">ณ ตำแหน่งรอยต่อระหว่างบันไดช่วงเอียงและชานพัก (Kink Point) แรงดึงและแรงอัดในปีกคานจะทำให้เกิดแรงลัพธ์ในแนวฉาก (Radial Force)</p>
                     
                     <p class="mb-2"><strong>โมเมนต์ดัดที่จุดหักมุม ($ M_{kink} $):</strong> ${fmt(data.M_kink, 2)} kg-m</p>
-                    <p class="mb-2"><strong>แรงดึงในปีกคาน (Flange Force, $ P_f $):</strong></p>
+                    <p class="mb-2"><strong>แรงลัพธ์ในแนวฉาก (Radial Force, $ F_r $):</strong></p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-orange-200">
                         $$ P_f = \\frac{M_{kink}}{d - t} = \\frac{${fmt(data.M_kink, 2)}}{${data.d_eff.toFixed(3)}} = ${fmt(data.Pf, 2)} \\text{ kg} $$
-                    </div>
-                    
-                    <p class="mb-2 mt-4"><strong>แรงลัพธ์ในแนวฉาก (Radial Force, $ F_r $):</strong></p>
-                    <div class="mt-2 mb-4 pl-4 border-l-2 border-orange-200">
                         $$ F_r = 2 P_f \\sin\\left(\\frac{\\theta}{2}\\right) = 2(${fmt(data.Pf, 2)}) \\sin\\left(\\frac{${data.theta_deg.toFixed(2)}^\\circ}{2}\\right) = \\mathbf{${fmt(data.Fr, 2)} \\text{ kg}} $$
                     </div>
                     
-                    <svg viewBox="0 0 450 240" class="w-full max-w-[550px] mx-auto bg-white border border-gray-200 rounded-xl shadow-sm my-5">
-                        <defs><marker id="arrow-pf" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#2563eb" /></marker><marker id="arrow-fr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#dc2626" /></marker></defs>
-                        <text x="20" y="30" font-size="14" fill="#334155" font-weight="bold">แผนภาพจำลองแรงที่จุดหักมุม (Kink Point Radial Force)</text>
-                        <g transform="translate(30, 20)">
-                            <polygon points="50,40 180,115 350,115 350,165 195,165 50,81.5" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-linejoin="round" />
-                            <line x1="180" y1="115" x2="195" y2="165" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
-                            <text x="255" y="104" font-size="12" fill="#ea580c" font-weight="bold">แผ่นดาม (Stiffener Plate)</text>
-                            <line x1="205" y1="165" x2="280" y2="165" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
-                            <text x="285" y="170" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
-                            <line x1="185" y1="159" x2="110" y2="116" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-pf)" />
-                            <text x="85" y="115" font-size="14" fill="#2563eb" font-weight="bold">Pf</text>
-                            <line x1="195" y1="165" x2="175" y2="80" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-fr)" />
-                            <rect x="80" y="45" width="120" height="25" fill="#fef2f2" rx="4" />
-                            <text x="85" y="62" font-size="14" fill="#dc2626" font-weight="bold">Fr = ${fmt(data.Fr, 0)} kg</text>
-                        </g>
-                    </svg>
-
                     <div class="mt-4 p-4 bg-white border border-red-300 rounded-lg shadow-sm">
                         <p class="text-red-700 font-bold mb-2">⚠️ การออกแบบขนาดแผ่นดาม (Stiffener Sizing):</p>
-                        <p class="text-gray-800 text-sm mb-2">ออกแบบแผ่นดามเพื่อรับแรงอัด $ F_r $ (อ้างอิง $ \\phi = 0.90 $ สำหรับ Local Yielding)</p>
                         <div class="mt-2 mb-4 pl-4 border-l-2 border-red-200">
                             $$ A_{req} = \\frac{F_r}{\\phi F_y} = \\frac{${fmt(data.Fr, 2)}}{0.90 \\times ${fmt(data.Fy, 0)}} = ${fmt(data.A_req_cm2, 3)} \\text{ cm}^2 $$
-                        </div>
-                        <p class="text-gray-800 text-sm mt-3 mb-2">เนื่องจากแผ่นดามเชื่อมติดด้านในของเหล็กกล่อง จึงถูกบังคับความกว้างให้เท่ากับ $ b_{inner} = ${data.b_inner_mm} \\text{ mm} $</p>
-                        <div class="mt-2 mb-4 pl-4 border-l-2 border-red-200">
                             $$ t_{req} = \\frac{A_{req}}{b_{inner}} = \\frac{${fmt(data.A_req_cm2, 3)}}{${data.b_inner_mm / 10}} \\times 10 = ${fmt(data.t_req_mm, 2)} \\text{ mm} $$
                         </div>
                         <div class="mt-4 bg-red-50 p-3 rounded-md border border-red-200">
-                            <p class="text-red-800 font-semibold text-sm">ข้อแนะนำการระบุในแบบ (Recommendation):</p>
-                            <p class="text-gray-800 text-sm mt-1">ควรใช้แผ่นเหล็ก Stiffener Plate หนาไม่น้อยกว่า <strong>${data.t_st_rec} mm</strong> (เชื่อมรอบตัว)</p>
+                            <p class="text-gray-800 text-sm mt-1">ข้อแนะนำ: ควรใช้แผ่นเหล็ก Stiffener Plate หนาไม่น้อยกว่า <strong>${data.t_st_rec} mm</strong> (เชื่อมรอบตัว)</p>
                         </div>
                     </div>
                 </div>
@@ -1125,10 +1256,9 @@
                     <h3>6. ตรวจสอบสภาพการใช้งาน (Serviceability & Vibration)</h3>
                     <p class="mb-2 mt-3"><strong>6.1 การโก่งตัวภายใต้น้ำหนักจร (Live Load Deflection)</strong> <span class="ref-text">[อ้างอิง: IBC 2018 Table 1604.3]</span></p>
                     <p>เกณฑ์ยอมรับ $ \\Delta_{limit} = L/400 = \\frac{${fmt(data.L*1000,0)}}{400} = ${data.def_limit_mm.toFixed(2)} \\text{ mm} $</p>
-                    <p class="text-gray-600 text-sm mt-1 mb-2">ประเมินจากการเทียบเท่าหน้าตัดคานราบ (Equivalent Horizontal Span):</p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
-                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 w_{LL} L^4}{384 E I_x}' : '\\frac{1 w_{LL} L^4}{384 E I_x}'} $$
-                        $$ \\Delta_{LL} = ${data.support_type === 'pinned' || data.support_type === 'pinned-roller' ? '\\frac{5 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E_ksc,0) + ') (' + fmt(data.Ix,2) + ')}' : '\\frac{1 (' + data.w_LL_cm.toFixed(2) + ') (' + data.L_cm.toFixed(0) + ')^4}{384 (' + fmt(data.E_ksc,0) + ') (' + fmt(data.Ix,2) + ')}'} = ${data.delta_LL_max_cm.toFixed(3)} \\text{ cm} = \\mathbf{${data.delta_LL_max_mm.toFixed(2)} \\text{ mm}} \\quad \\textcolor{${data.delta_LL_max_mm <= data.def_limit_mm ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.delta_LL_max_mm <= data.def_limit_mm ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
+                        <p class="text-gray-600 text-sm mb-2">ระยะโก่งตัวดึงจากแบบจำลอง DSM (ที่จุดหักมุม):</p>
+                        $$ \\Delta_{LL} = \\mathbf{${data.delta_LL_max_mm.toFixed(2)} \\text{ mm}} \\quad \\textcolor{${data.delta_LL_max_mm <= data.def_limit_mm ? '#15803d' : '#b91c1c'}}{\\mathbf{${data.delta_LL_max_mm <= data.def_limit_mm ? '(ผ่าน)' : '(ไม่ผ่าน)'}}} $$
                     </div>
                     <p class="mb-2 mt-4"><strong>6.2 ความถี่ธรรมชาติสำหรับการสั่นสะเทือน (Natural Frequency)</strong> <span class="ref-text">[อ้างอิง: AISC Design Guide 11]</span></p>
                     <div class="mt-2 mb-4 pl-4 border-l-2 border-gray-200">
@@ -1146,9 +1276,9 @@
                     <p class="text-gray-500 mt-1">คำอธิบายสัญลักษณ์ทางวิศวกรรมที่ใช้ในรายการคำนวณ</p>
                 </div>
                 <table class="calc-table">
-                    <thead><tr><th>สัญลักษณ์ (Symbol)</th><th>ความหมาย (Description)</th><th>หน่วย (Unit)</th></tr></thead>
+                    <thead><tr><th style="width: 20%;">สัญลักษณ์ (Symbol)</th><th style="width: 60%;">ความหมาย (Description)</th><th style="width: 20%;">หน่วย (Unit)</th></tr></thead>
                     <tbody>
-                        <tr><td>$L$</td><td>ระยะพาดแนวนอน (Horizontal Span)</td><td>m</td></tr>
+                        <tr><td>$L$</td><td>ระยะพาดแนวนอนรวม (Total Horizontal Span)</td><td>m</td></tr>
                         <tr><td>$H$</td><td>ความสูงรวมระหว่างชั้น (Total Height)</td><td>m</td></tr>
                         <tr><td>$W$</td><td>ความกว้างบันได (Stair Width)</td><td>m</td></tr>
                         <tr><td>$\\theta$</td><td>มุมเอียงของบันไดเทียบกับแนวระนาบ (Inclination Angle)</td><td>degrees</td></tr>
@@ -1157,60 +1287,45 @@
                         <tr><td>$t$</td><td>ความหนาของหน้าตัดเหล็กแม่บันได (Section Thickness)</td><td>mm</td></tr>
                         <tr><td>$E$</td><td>โมดูลัสยืดหยุ่นของเหล็ก (Elastic Modulus)</td><td>ksc</td></tr>
                         <tr><td>$F_y$</td><td>กำลังครากของเหล็ก (Yield Strength)</td><td>ksc</td></tr>
+                        <tr><td>$F_{cr}$</td><td>ความเค้นวิกฤตของการโก่งเดาะ (Critical Buckling Stress)</td><td>ksc</td></tr>
                         <tr><td>$A$</td><td>พื้นที่หน้าตัดเหล็ก (Cross-sectional Area)</td><td>cm²</td></tr>
-                        <tr><td>$I_x$</td><td>โมเมนต์ความเฉื่อยรอบแกนหลัก (Moment of Inertia)</td><td>cm⁴</td></tr>
+                        <tr><td>$I_x, I_y$</td><td>โมเมนต์ความเฉื่อยรอบแกนหลัก (Moment of Inertia)</td><td>cm⁴</td></tr>
                         <tr><td>$Z_x$</td><td>มอดูลัสหน้าตัดพลาสติก (Plastic Section Modulus)</td><td>cm³</td></tr>
-                        <tr><td>$LL$</td><td>น้ำหนักบรรทุกจร (Live Load)</td><td>kg/m²</td></tr>
+                        <tr><td>$S_x$</td><td>มอดูลัสหน้าตัดอิลาสติก (Elastic Section Modulus)</td><td>cm³</td></tr>
+                        <tr><td>$LL$</td><td>น้ำหนักบรรทุกจรแบบกระจายสม่ำเสมอ (Uniform Live Load)</td><td>kg/m²</td></tr>
+                        <tr><td>$P_L$</td><td>น้ำหนักบรรทุกจรแบบจุด (Concentrated Point Load)</td><td>kg</td></tr>
                         <tr><td>$SDL$</td><td>น้ำหนักวัสดุตกแต่ง (Superimposed Dead Load)</td><td>kg/m²</td></tr>
-                        <tr><td>$w_{DL}$</td><td>น้ำหนักคงที่กระจายสม่ำเสมอตามแนวคาน (Distributed Dead Load)</td><td>kg/m</td></tr>
-                        <tr><td>$w_{LL}$</td><td>น้ำหนักจรกระจายสม่ำเสมอตามแนวคาน (Distributed Live Load)</td><td>kg/m</td></tr>
-                        <tr><td>$w_u$</td><td>น้ำหนักประลัยกระจายสม่ำเสมอ (Factored Uniform Load)</td><td>kg/m</td></tr>
-                        <tr><td>$R_x$</td><td>แรงปฏิกิริยาแนวราบที่จุดรองรับ (Horizontal Reaction)</td><td>kg</td></tr>
+                        <tr><td>$w_u$</td><td>น้ำหนักประลัยกระจายสม่ำเสมอตามแนวคาน (Factored Uniform Load)</td><td>kg/m</td></tr>
+                        <tr><td>$R_x$</td><td>แรงปฏิกิริยาแนวราบที่จุดรองรับ (Horizontal Reaction / Thrust)</td><td>kg</td></tr>
                         <tr><td>$R_y$</td><td>แรงปฏิกิริยาแนวดิ่งที่จุดรองรับ (Vertical Reaction)</td><td>kg</td></tr>
                         <tr><td>$M_z$</td><td>โมเมนต์ปฏิกิริยาที่จุดรองรับ (Moment Reaction)</td><td>kg-m</td></tr>
-                        <tr><td>$P_u$</td><td>แรงอัดประลัยสูงสุด (Factored Axial Force)</td><td>kg</td></tr>
-                        <tr><td>$M_u$</td><td>โมเมนต์ดัดประลัยสูงสุด (Factored Bending Moment)</td><td>kg-m</td></tr>
-                        <tr><td>$V_u$</td><td>แรงเฉือนประลัยสูงสุด (Factored Shear Force)</td><td>kg</td></tr>
-                        <tr><td>$P_n$</td><td>กำลังรับแรงอัดระบุ (Nominal Axial Strength)</td><td>kg</td></tr>
-                        <tr><td>$M_n$</td><td>กำลังรับโมเมนต์ดัดระบุ (Nominal Flexural Strength)</td><td>kg-m</td></tr>
-                        <tr><td>$V_n$</td><td>กำลังรับแรงเฉือนระบุ (Nominal Shear Strength)</td><td>kg</td></tr>
+                        <tr><td>$P_u$</td><td>แรงอัดประลัยสูงสุดที่ใช้ในการออกแบบ (Design Factored Axial Force)</td><td>kg</td></tr>
+                        <tr><td>$M_u$</td><td>โมเมนต์ดัดประลัยสูงสุดที่ใช้ในการออกแบบ (Design Factored Bending Moment)</td><td>kg-m</td></tr>
+                        <tr><td>$V_u$</td><td>แรงเฉือนประลัยสูงสุดที่ใช้ในการออกแบบ (Design Factored Shear Force)</td><td>kg</td></tr>
+                        <tr><td>$\\phi_c P_n$</td><td>กำลังรับแรงอัดออกแบบ (Design Axial Strength)</td><td>kg</td></tr>
+                        <tr><td>$\\phi_b M_n$</td><td>กำลังรับโมเมนต์ดัดออกแบบ (Design Flexural Strength)</td><td>kg-m</td></tr>
+                        <tr><td>$\\phi_v V_n$</td><td>กำลังรับแรงเฉือนออกแบบ (Design Shear Strength)</td><td>kg</td></tr>
                         <tr><td>$M_{kink}$</td><td>โมเมนต์ดัดที่เกิดขึ้นบริเวณจุดหักมุม (Kink Point Moment)</td><td>kg-m</td></tr>
-                        <tr><td>$P_f$</td><td>แรงกระทำในปีกคานบริเวณจุดหักมุม (Flange Force)</td><td>kg</td></tr>
                         <tr><td>$F_r$</td><td>แรงลัพธ์ในแนวฉากที่กระทำต่อปีกคานบริเวณจุดหักมุม (Radial Force)</td><td>kg</td></tr>
-                        <tr><td>$A_{req}$</td><td>พื้นที่หน้าตัดที่ต้องการสำหรับแผ่นดาม (Required Stiffener Area)</td><td>cm²</td></tr>
-                        <tr><td>$t_{req}$</td><td>ความหนาที่ต้องการสำหรับแผ่นดาม (Required Stiffener Thickness)</td><td>mm</td></tr>
-                        <tr><td>$\\phi$</td><td>ตัวคูณลดกำลัง (Resistance Factor) = 0.90</td><td>-</td></tr>
-                        <tr><td>$f_n$</td><td>ความถี่ธรรมชาติของโครงสร้างบันได (Natural Frequency)</td><td>Hz</td></tr>
-                        <tr><td>$\\Delta_{limit}$</td><td>การโก่งตัวที่ยอมรับได้ (Allowable Deflection)</td><td>mm</td></tr>
-                        <tr><td>$\\Delta_{LL}$</td><td>การโก่งตัวสูงสุดภายใต้น้ำหนักบรรทุกจร (Live Load Deflection)</td><td>mm</td></tr>
-                        <tr><td>$\\Delta_{active}$</td><td>การโก่งตัวภายใต้น้ำหนักมวลแอกทีฟ (Active Mass Deflection)</td><td>mm</td></tr>
                     </tbody>
                 </table>
 
                 <div class="mt-12">
                     <div class="report-header">
-                        <h2 class="text-2xl font-bold text-gray-900">ทฤษฎีการวิเคราะห์โครงสร้าง (Direct Stiffness Method)</h2>
-                        <p class="text-gray-500 mt-1">อธิบายหลักการประมวลผลของ Matrix Solver ที่อยู่เบื้องหลังโปรแกรม</p>
+                        <h2 class="text-2xl font-bold text-gray-900">ทฤษฎีการวิเคราะห์โครงสร้าง (Direct Stiffness Method - DSM)</h2>
+                        <p class="text-gray-500 mt-1">หลักการประมวลผลของ Matrix Solver ที่อยู่เบื้องหลังโปรแกรมนี้</p>
                     </div>
                     <div class="space-y-6 text-sm text-gray-700">
                         <p>
-                            โปรแกรม <strong>Staircase Pro</strong> ใช้ระเบียบวิธี <strong>Direct Stiffness Method (DSM)</strong> ซึ่งเป็นรากฐานของโปรแกรม Finite Element (เช่น MIDAS Gen, SAP2000) ในการวิเคราะห์หาแรงภายในและแรงปฏิกิริยา แทนการใช้สมการมือพื้นฐาน (Equivalent Beam) ทั้งนี้เพื่อให้สามารถจับพฤติกรรมโครงสร้างจริง เช่น <strong>แรงถีบ (Arching Action)</strong> และ <strong>การถ่ายเทแรงข้ามแกน (Axial-Flexural Coupling)</strong> บริเวณรอยต่อหักมุมได้อย่างแม่นยำ
+                            โปรแกรม <strong>Staircase Pro</strong> ใช้ระเบียบวิธี <strong>Direct Stiffness Method (DSM)</strong> ซึ่งเป็นรากฐานของโปรแกรม Finite Element ระดับโลก (เช่น MIDAS Gen, SAP2000) ในการวิเคราะห์หาแรงภายใน แทนการใช้สมการมือพื้นฐาน (Equivalent Beam) ทั้งนี้เพื่อให้สามารถจับพฤติกรรม <strong>แรงถีบ (Arching Action)</strong> และ <strong>การถ่ายเทแรงข้ามแกน</strong> บริเวณรอยต่อหักมุมได้อย่างแม่นยำ 100%
                         </p>
                         <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
-                            <h3 class="font-bold text-gray-900 mb-3">ขั้นตอนการวิเคราะห์โครงสร้างด้วย DSM:</h3>
+                            <h3 class="font-bold text-gray-900 mb-3">ขั้นตอนการวิเคราะห์โครงสร้าง:</h3>
                             <ol class="list-decimal ml-5 space-y-3">
-                                <li>
-                                    <strong>การแบ่งชิ้นส่วน (Discretization):</strong> โปรแกรมจะแบ่งบันไดออกเป็น 3 ชิ้นส่วน (Elements) ได้แก่ ช่วงบันไดล่าง, ชานพัก, และช่วงบันไดบน เชื่อมต่อกันด้วยจุดต่อ (Nodes) ทั้งหมด 4 จุด
-                                </li>
-                                <li>
-                                    <strong>สร้างเมทริกซ์ความแข็งเกร็ง (Global Stiffness Matrix, $[K]$):</strong> แปลงคุณสมบัติชิ้นส่วน ($A, I, E, L$) เป็นเมทริกซ์สปริง 6x6 ในแกน Local และใช้เมทริกซ์แปลงพิกัด (Transformation Matrix, $[T]$) หมุนองศา $\\theta$ ให้เข้าสู่แกน Global X-Y นำมาประกอบเป็นระบบสมการขนาด 12x12
-                                </li>
-                                <li>
-                                    <strong>การแก้สมการ (Solve for Displacements, $[U]$):</strong> กำหนดเงื่อนไขขอบเขต (Support Conditions) เช่น Fixed, Pinned และนำน้ำหนักบรรทุกเทียบเท่าที่จุดต่อ (Equivalent Nodal Loads) มาแก้สมการ <strong>$[F] = [K][U]$</strong> ด้วยวิธีกำจัดแบบเกาส์ (Gauss Elimination) เพื่อหาระยะแอ่นและการบิดหมุนที่ทุกจุดต่อ
-                                </li>
-                                <li>
-                                    <strong>คำนวณแรงภายใน (Internal Forces):</strong> นำระยะเคลื่อนตัวที่คำนวณได้ ไปคูณกลับด้วย Local Stiffness Matrix เพื่อให้ได้แรงตามแนวแกน (Axial), แรงเฉือน (Shear), และโมเมนต์ดัด (Bending) ที่เกิดขึ้นจริงบนแกนความเอียงของชิ้นส่วน
-                                </li>
+                                <li><strong>การแบ่งชิ้นส่วน (Discretization):</strong> แปลงบันไดเป็น 3 ชิ้นส่วน (Elements) เชื่อมกันด้วยจุดต่อ (Nodes) 4 จุด</li>
+                                <li><strong>สร้างเมทริกซ์ (Stiffness Matrix, $[K]$):</strong> แปลงคุณสมบัติวัสดุและหน้าตัด ($E, A, I, L$) เป็นเมทริกซ์สปริง 6x6 ในแกน Local และใช้เมทริกซ์แปลงพิกัด (Transformation Matrix) หมุนเข้าสู่แกน Global X-Y ประกอบเป็นระบบสมการขนาด 12x12</li>
+                                <li><strong>การแก้สมการ (Solve for Displacements, $[U]$):</strong> กำหนดเงื่อนไข Support (Fixed, Pinned) และแก้สมการ <strong>$[F] = [K][U]$</strong> ด้วยวิธีกำจัดแบบเกาส์ (Gauss Elimination) เพื่อหาระยะแอ่นและการบิดหมุนที่จุดหักมุม</li>
+                                <li><strong>คำนวณแรงภายใน (Internal Forces):</strong> นำระยะเคลื่อนตัว $[U]$ ไปคูณกลับด้วย Local Stiffness Matrix เพื่อให้ได้แรงตามแนวแกน (Axial) แรงเฉือน (Shear) และโมเมนต์ดัด (Bending) ที่เกิดขึ้นจริงตามแกนความเอียง</li>
                             </ol>
                         </div>
                     </div>
@@ -1219,20 +1334,16 @@
                 <div class="mt-12">
                     <div class="report-header">
                         <h2 class="text-2xl font-bold text-gray-900">คำแนะนำการนำแรงไปออกแบบจุดเชื่อมต่อ (Connection Guidelines)</h2>
-                        <p class="text-gray-500 mt-1">การนำค่าจากโปรแกรมไปออกแบบจุดต่อโครงสร้างตามมาตรฐาน มีแนวทางดังนี้</p>
                     </div>
                     <div class="space-y-8">
                         <div>
                             <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">1. จุดรองรับที่ฐานบันได (Base Support / Base Plate)</h3>
                             <p class="text-sm text-gray-600 mb-3">คือจุดที่โคนบันไดเหล็กยึดติดกับพื้นตอม่อคอนกรีต หรือคานเหล็กชั้นล่าง</p>
                             <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
-                                <li><strong>$R_{y1}$ (แรงปฏิกิริยาแนวดิ่ง <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Ry1), 2)} kg</span>):</strong> ใช้คำนวณหากำลังรับแรงเฉือนของรอยเชื่อม, แรงเฉือนใน Anchor Bolt และ Bearing (การกดทับ) บน Base Plate</li>
-                                <li><strong>$R_{x1}$ (แรงถีบแนวราบ <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Rx1), 2)} kg</span>):</strong> ถ้าจุดรองรับเป็น Fixed หรือ Pinned จะต้องนำแรงนี้ไปคำนวณแรงเฉือน (Shear) หรือแรงดึง (Tension) ในน็อตฝังด้วย (แรงนี้มักจะทำให้จุดต่อวิกฤต)</li>
-                                <li><strong>$M_{z1}$ (โมเมนต์ที่ฐาน <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Mz1), 2)} kg-m</span>):</strong> ถ้าจุดรองรับเป็น Fixed ต้องนำค่าไปหาความหนาแผ่นเหล็ก Base Plate และคำนวณแรงดึง-อัดในกลุ่มน็อตฝัง (Anchor Bolt)</li>
+                                <li><strong>$R_{y1}$ (แรงปฏิกิริยาแนวดิ่ง <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Ry1), 2)} kg</span>):</strong> ใช้คำนวณหากำลังรับแรงเฉือนของรอยเชื่อม, แรงเฉือนใน Anchor Bolt และ Bearing บน Base Plate</li>
+                                <li><strong>$R_{x1}$ (แรงถีบแนวราบ <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Rx1), 2)} kg</span>):</strong> หากมีค่าแรงถีบ ต้องนำแรงนี้ไปคำนวณแรงเฉือน (Shear) หรือแรงดึง (Tension) ในน็อตฝังด้วย</li>
+                                <li><strong>$M_{z1}$ (โมเมนต์ที่ฐาน <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(Math.abs(data.Mz1), 2)} kg-m</span>):</strong> ถ้าจุดรองรับเป็น Fixed ต้องนำค่าไปหาความหนา Base Plate และคำนวณแรงดึง-อัดใน Anchor Bolt</li>
                             </ul>
-                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
-                                <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดและความหนาของ Base Plate, ขนาด/ระยะฝังของ Anchor Bolt, ขนาดรอยเชื่อม (Fillet Weld)
-                            </div>
                         </div>
 
                         <div>
@@ -1242,7 +1353,7 @@
                                 <li>ใช้หลักการเดียวกับฐานบันไดคือดึงค่าปฏิกิริยา <strong>$R_{y2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Ry2), 2)} kg</span>), $R_{x2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Rx2), 2)} kg</span>), $M_{z2}$ (<span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">${fmt(Math.abs(data.Mz2), 2)} kg-m</span>)</strong> ไปใช้งาน</li>
                             </ul>
                             <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-sm text-red-800">
-                                <span class="font-bold">⚠️ ข้อควรระวังสูงสุด:</span> คานของตัวอาคารที่มารับบันได จะต้องถูกออกแบบให้รับแรง <strong>$R_{x2}$ (แรงถีบ)</strong> จากบันไดด้วย ซึ่งจะทำให้คานอาคารเกิด "การดัดในแกนอ่อน (Weak-axis Bending)" หรือ "แรงบิด (Torsion)" หากไม่ได้เตรียมคานอาคารไว้รับแรงถีบ แนะนำให้ออกแบบจุดรองรับบันไดฝั่งใดฝั่งหนึ่งเป็นจุดเลื่อน (Roller) เพื่อให้ $R_x = 0$
+                                <span class="font-bold">⚠️ ข้อควรระวังสูงสุด:</span> คานอาคารที่มารับบันได จะต้องถูกออกแบบให้รับแรง <strong>$R_{x2}$ (แรงถีบ)</strong> ซึ่งจะทำให้คานเกิด "การดัดในแกนอ่อน (Weak-axis Bending)" หรือ "แรงบิด (Torsion)" หากไม่ได้เตรียมคานไว้รับแรงถีบ แนะนำให้ออกแบบจุดรองรับฝั่งใดฝั่งหนึ่งเป็นแบบจุดเลื่อน (Roller) เพื่อให้ $R_{x} = 0$
                             </div>
                         </div>
 
@@ -1250,13 +1361,9 @@
                             <h3 class="text-lg font-bold text-blue-900 mb-2 border-b pb-2">3. รอยต่อจุดหักมุม (Kink Point / Splice Connection)</h3>
                             <p class="text-sm text-gray-600 mb-3">จุดที่ช่างจะต้องทำการ "ตัดบาก (Miter Cut)" และเชื่อมต่อเหล็กกล่องให้หักมุมตามรูปทรงบันได</p>
                             <ul class="list-disc ml-6 text-sm text-gray-700 space-y-2 mb-4">
-                                <li><strong>$M_{kink}$ (โมเมนต์ที่จุดหักมุม <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.M_kink, 2)} kg-m</span>):</strong> ใช้คำนวณหาแรงดึง/แรงอัดในปีกคาน ($P_f$) เพื่อประเมินพื้นที่หน้าตัดของรอยเชื่อม</li>
-                                <li><strong>$F_r$ (Radial Force <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.Fr, 2)} kg</span>):</strong> ใช้สำหรับออกแบบความหนาของแผ่น Stiffener Plate ดามด้านใน เพื่อป้องกันไม่ให้มุมคานเหล็กกล่องฉีกขาดเสียรูป</li>
-                                <li><strong>$V_u$ และ $P_u$ (Local Forces <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">-> Vu = ${fmt(data.Vu, 2)} kg, Pu = ${fmt(data.Pu, 2)} kg</span>):</strong> นำค่าแรงเฉือนและแรงตามแนวแกนบริเวณรอยต่อ มารวมกับการเช็ครอยเชื่อม</li>
+                                <li><strong>$M_{kink}$ (โมเมนต์ที่จุดหักมุม <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.M_kink, 2)} kg-m</span>):</strong> ใช้ประเมินรอยเชื่อมชน (CJP Weld)</li>
+                                <li><strong>$F_r$ (Radial Force <span class="text-blue-700 font-mono bg-blue-50 px-1 rounded">= ${fmt(data.Fr, 2)} kg</span>):</strong> ใช้สำหรับออกแบบความหนาแผ่น Stiffener Plate ดามด้านใน เพื่อป้องกันมุมคานฉีกขาดเสียรูป</li>
                             </ul>
-                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800">
-                                <span class="font-bold">สิ่งที่จะต้องคำนวณต่อ:</span> ขนาดรอยเชื่อมต่อชน (แนะนำให้เป็น CJP - Complete Joint Penetration) และการเชื่อมยึดแผ่น Stiffener
-                            </div>
                         </div>
                     </div>
                 </div>
